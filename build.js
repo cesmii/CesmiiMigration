@@ -34,6 +34,8 @@ const DYNAMIC_SECTIONS = [
   { prefix: '/project', hsBase: 'https://43818189.hs-sites.com/project' },
   { prefix: '/events', hsBase: 'https://43818189.hs-sites.com/events' },
   { prefix: '/hs-search-results', hsBase: 'https://43818189.hs-sites.com/hs-search-results' },
+  { prefix: '/sm-profiles', hsBase: 'https://43818189.hs-sites.com/sm-profiles' },
+  { prefix: '/sm-interoperability-platform', hsBase: 'https://43818189.hs-sites.com/sm-interoperability-platform' },
 ];
 
 const PROJECT_ROOT = __dirname;
