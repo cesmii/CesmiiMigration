@@ -202,6 +202,24 @@ Credentials</text>
               <propd>100%</propd>
               <member>
                 <box>
+                  <text>SM Profiles
+#http://43818189.hs-sites.com/sm-profiles</text>
+                  <propa>#cc9ef2</propa>
+                  <propb>#000000</propb>
+                  <propc>Lato</propc>
+                  <propd>100%</propd>
+                  <member/>
+                </box>
+                <box>
+                  <text>SM Interoperability Platform
+#http://43818189.hs-sites.com/sm-interoperability-platform</text>
+                  <propa>#cc9ef2</propa>
+                  <propb>#000000</propb>
+                  <propc>Lato</propc>
+                  <propd>100%</propd>
+                  <member/>
+                </box>
+                <box>
                   <text>i3X</text>
                   <propa>#cc9ef2</propa>
                   <propb>#000000</propb>
