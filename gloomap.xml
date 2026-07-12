@@ -94,7 +94,8 @@
           <propb>#000000</propb>
           <member>
             <box>
-              <text>Education</text>
+              <text>Education
+#https://membershiphub.cesmii.org/sm-education</text>
               <propa>#cc9ef2</propa>
               <propb>#000000</propb>
               <propc>Lato</propc>
