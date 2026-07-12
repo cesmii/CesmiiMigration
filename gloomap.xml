@@ -60,7 +60,8 @@
           <propb>#000000</propb>
           <member>
             <box>
-              <text>Become a Member</text>
+              <text>Become a Member
+#https://membershiphub.cesmii.org/membership-sign-in</text>
               <propa>#cc9ef2</propa>
               <propb>#000000</propb>
               <propc>Lato</propc>
