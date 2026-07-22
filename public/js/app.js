@@ -116,12 +116,25 @@ function initHubSpotLinkRewrite() {
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
-  // Capturing-phase click handler as a safety net
+  // Capturing-phase click handler — fires before HubSpot's own handlers.
   document.addEventListener('click', function (e) {
     var a = e.target.closest('a[href]');
     if (!a) return;
     var href = a.getAttribute('href');
     if (!href) return;
+
+    // Search result links: HubSpot's analytics script intercepts these
+    // and redirects through /_hcms/analytics/search/conversion, which
+    // fails with INVALID_SIGNATURE through the proxy. Bypass it by
+    // navigating directly to the href (already rewritten to local).
+    if (a.closest('.hs-search-results')) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      location.href = href;
+      return;
+    }
+
+    // Any other link still pointing to the HubSpot domain
     try {
       var url = new URL(href, location.origin);
       if (url.hostname === HS_HOST) {
