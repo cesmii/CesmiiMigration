@@ -72,27 +72,22 @@ html, body {
   padding: 0;
 }
 
-/* Restore browser defaults inside HubSpot content area */
+/* Restore browser defaults inside HubSpot content area.
+   All text links are underlined by default; links that wrap images
+   or are styled as badges/buttons are excluded. */
 .content-proxy a {
   color: revert;
-  text-decoration: revert;
-}
-
-/* Ensure inline text links in proxied content are visually distinct.
-   Scoped to text-level containers so buttons, headings, and tags
-   keep their own styling. */
-.content-proxy p a,
-.content-proxy li a,
-.content-proxy td a,
-.content-proxy dd a,
-.content-proxy blockquote a {
   text-decoration: underline !important;
 }
-.content-proxy p a:hover,
-.content-proxy li a:hover,
-.content-proxy td a:hover,
-.content-proxy dd a:hover,
-.content-proxy blockquote a:hover {
+.content-proxy a:hover {
+  text-decoration: none !important;
+}
+/* Don't underline links that wrap images or are styled as buttons/badges */
+.content-proxy a:has(> img),
+.content-proxy a.blog-tag,
+.content-proxy a[class*="btn"],
+.content-proxy a[class*="button"],
+.content-proxy a[class*="cta"] {
   text-decoration: none !important;
 }
 
