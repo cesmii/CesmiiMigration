@@ -89,6 +89,7 @@ html, body {
 .content-proxy a[class*="btn"],
 .content-proxy a[class*="button"],
 .content-proxy a[class*="cta"] {
+  color: revert !important;
   text-decoration: none !important;
 }
 
