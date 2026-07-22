@@ -123,14 +123,27 @@ function initHubSpotLinkRewrite() {
     var href = a.getAttribute('href');
     if (!href) return;
 
-    // Search result links: HubSpot's analytics script intercepts these
-    // and redirects through /_hcms/analytics/search/conversion, which
-    // fails with INVALID_SIGNATURE through the proxy. Bypass it by
-    // navigating directly to the href (already rewritten to local).
+    // Search result links: HubSpot's analytics script rewrites the href
+    // to a tracking URL (/_hcms/analytics/search/conversion?redirect=<base64>)
+    // before the click. That endpoint fails with INVALID_SIGNATURE through
+    // the proxy. Detect the tracking URL, decode the redirect, and navigate
+    // to the local path instead.
     if (a.closest('.hs-search-results')) {
       e.preventDefault();
       e.stopImmediatePropagation();
-      location.href = href;
+      var target = href;
+      if (href.indexOf('/_hcms/analytics/') !== -1) {
+        try {
+          var params = new URLSearchParams(href.split('?')[1]);
+          var redirect = params.get('redirect');
+          if (redirect) {
+            var decoded = atob(redirect);
+            var rurl = new URL(decoded);
+            target = rurl.pathname + rurl.search + rurl.hash;
+          }
+        } catch (_) {}
+      }
+      location.href = target;
       return;
     }
 
