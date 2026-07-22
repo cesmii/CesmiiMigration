@@ -78,6 +78,24 @@ html, body {
   text-decoration: revert;
 }
 
+/* Ensure inline text links in proxied content are visually distinct.
+   Scoped to text-level containers so buttons, headings, and tags
+   keep their own styling. */
+.content-proxy p a,
+.content-proxy li a,
+.content-proxy td a,
+.content-proxy dd a,
+.content-proxy blockquote a {
+  text-decoration: underline !important;
+}
+.content-proxy p a:hover,
+.content-proxy li a:hover,
+.content-proxy td a:hover,
+.content-proxy dd a:hover,
+.content-proxy blockquote a:hover {
+  text-decoration: none !important;
+}
+
 .content-proxy ul,
 .content-proxy ol {
   list-style: revert;

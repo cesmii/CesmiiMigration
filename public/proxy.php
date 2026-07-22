@@ -195,6 +195,9 @@ function _hs_scope_css(string $css): string {
     $css = preg_replace('/@charset\s+[^;]+;/i', '', $css);
     $css = preg_replace('/@import\s+[^;]+;/i', '', $css);
 
+    // Strip !important from text-decoration so theme-bridge can enforce link styling
+    $css = preg_replace('/text-decoration\s*:\s*([^;!}]+)\s*!important/i', 'text-decoration: $1', $css);
+
     // Process the CSS: scope selectors inside .content-proxy
     return preg_replace_callback(
         '/@?[^{}]+\{/',
