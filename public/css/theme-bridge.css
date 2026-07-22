@@ -76,10 +76,11 @@ html, body {
    All text links are underlined by default; links that wrap images
    or are styled as badges/buttons are excluded. */
 .content-proxy a {
-  color: revert;
+  color: #4084ef !important;
   text-decoration: underline !important;
 }
 .content-proxy a:hover {
+  color: #2b47da !important;
   text-decoration: none !important;
 }
 /* Don't underline links that wrap images or are styled as buttons/badges */
