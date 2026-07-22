@@ -70,12 +70,53 @@ function initFilterHighlight() {
 }
 
 /**
- * Intercept clicks on links pointing to the HubSpot CMS domain and
- * navigate to the equivalent local path instead. HubSpot's search module
- * renders result links client-side with absolute HubSpot URLs; this keeps
- * the user on the CESMII site shell.
+ * Rewrite links pointing to the HubSpot CMS domain so users stay on-site.
+ *
+ * Two mechanisms:
+ * 1. MutationObserver rewrites href attributes as HubSpot's JS inserts
+ *    search results into the DOM — links are fixed before the user clicks.
+ * 2. Capturing-phase click handler as a fallback for anything the observer
+ *    misses (e.g. links built from concatenated strings in JS).
  */
 function initHubSpotLinkRewrite() {
+  var HS_HOST = '43818189.hs-sites.com';
+
+  function rewriteLinks(root) {
+    var anchors = root.querySelectorAll
+      ? root.querySelectorAll('a[href*="' + HS_HOST + '"]')
+      : [];
+    for (var i = 0; i < anchors.length; i++) {
+      rewriteOne(anchors[i]);
+    }
+    if (root.matches && root.matches('a[href]')) rewriteOne(root);
+  }
+
+  function rewriteOne(a) {
+    var href = a.getAttribute('href');
+    if (!href) return;
+    try {
+      var url = new URL(href, location.origin);
+      if (url.hostname === HS_HOST) {
+        a.setAttribute('href', url.pathname + url.search + url.hash);
+      }
+    } catch (_) {}
+  }
+
+  // Rewrite any HubSpot links already in the page
+  rewriteLinks(document.body);
+
+  // Watch for dynamically-added links (search results, etc.)
+  var observer = new MutationObserver(function (mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      var added = mutations[i].addedNodes;
+      for (var j = 0; j < added.length; j++) {
+        if (added[j].nodeType === 1) rewriteLinks(added[j]);
+      }
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Capturing-phase click handler as a safety net
   document.addEventListener('click', function (e) {
     var a = e.target.closest('a[href]');
     if (!a) return;
@@ -83,12 +124,13 @@ function initHubSpotLinkRewrite() {
     if (!href) return;
     try {
       var url = new URL(href, location.origin);
-      if (url.hostname === '43818189.hs-sites.com') {
+      if (url.hostname === HS_HOST) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         location.href = url.pathname + url.search + url.hash;
       }
-    } catch (_) { /* invalid URL, ignore */ }
-  });
+    } catch (_) {}
+  }, true);
 }
 
 function initScrollEffect() {
