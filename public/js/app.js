@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDropdowns();
   initScrollEffect();
   initFilterHighlight();
+  initHubSpotLinkRewrite();
 });
 
 function initNavToggle() {
@@ -65,6 +66,28 @@ function initFilterHighlight() {
     // Strip protocol-relative or absolute HubSpot origin to get local path
     href = href.replace(/^(?:https?:)?\/\/[^/]+/, '');
     btn.classList.toggle('is-active', href === path);
+  });
+}
+
+/**
+ * Intercept clicks on links pointing to the HubSpot CMS domain and
+ * navigate to the equivalent local path instead. HubSpot's search module
+ * renders result links client-side with absolute HubSpot URLs; this keeps
+ * the user on the CESMII site shell.
+ */
+function initHubSpotLinkRewrite() {
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href) return;
+    try {
+      var url = new URL(href, location.origin);
+      if (url.hostname === '43818189.hs-sites.com') {
+        e.preventDefault();
+        location.href = url.pathname + url.search + url.hash;
+      }
+    } catch (_) { /* invalid URL, ignore */ }
   });
 }
 
