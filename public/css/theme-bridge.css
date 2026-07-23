@@ -77,6 +77,7 @@ html, body {
    Links that wrap images or are styled as buttons/badges keep their own colors. */
 .content-proxy a {
   color: #4084ef !important;
+  text-decoration: none !important;
 }
 .content-proxy a:hover {
   color: #2b47da !important;
