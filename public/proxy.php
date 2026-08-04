@@ -335,15 +335,20 @@ function _hs_rewrite_urls(string $html, string $source_url): string {
     //
     // Only applies while proxying the newsletter blog; /news keeps its own links, and
     // dynamic.php separately redirects /news/topic/newsletter here.
+    // Delimiter is ~, not # — PHP finds the closing delimiter without regard for
+    // character classes, so a # inside [^"?#] would end the pattern early, and
+    // preg_replace_callback would return null and blank the page.
     if (str_starts_with($parts['path'] ?? '', '/newsletter')) {
-        $html = preg_replace_callback(
-            '#href="/newsletter/(topic|tag)/([^"?#]+)([^"]*)"#i',
+        $remapped = preg_replace_callback(
+            '~href="/newsletter/(topic|tag)/([^"?#]+)([^"]*)"~i',
             function ($m) {
                 if (stripos($m[2], 'newsletter') !== false) return 'href="/newsletter"';
                 return 'href="/news/' . $m[1] . '/' . $m[2] . $m[3] . '"';
             },
             $html
         );
+        // Never let a regex failure blank the page — serve the un-remapped content.
+        if ($remapped !== null) $html = $remapped;
     }
 
     // Remap HubSpot paths to their local nav-hierarchy equivalents (e.g. /smec → /about/sm-executive-council)
