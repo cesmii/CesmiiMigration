@@ -326,6 +326,26 @@ function _hs_rewrite_urls(string $html, string $source_url): string {
         $html
     );
 
+    // The category filter bar is shared markup rendered by both blogs, so it always
+    // points at <current-blog>/topic/<slug>. On the newsletter blog that means every
+    // category button asks the newsletter blog for press releases, thought leadership
+    // and so on — none of which live there, so each lands on an empty listing. Point
+    // the category links back at the news blog, where those posts actually are, and
+    // collapse the Newsletter button onto this blog's own index.
+    //
+    // Only applies while proxying the newsletter blog; /news keeps its own links, and
+    // dynamic.php separately redirects /news/topic/newsletter here.
+    if (str_starts_with($parts['path'] ?? '', '/newsletter')) {
+        $html = preg_replace_callback(
+            '#href="/newsletter/(topic|tag)/([^"?#]+)([^"]*)"#i',
+            function ($m) {
+                if (stripos($m[2], 'newsletter') !== false) return 'href="/newsletter"';
+                return 'href="/news/' . $m[1] . '/' . $m[2] . $m[3] . '"';
+            },
+            $html
+        );
+    }
+
     // Remap HubSpot paths to their local nav-hierarchy equivalents (e.g. /smec → /about/sm-executive-council)
     $html = preg_replace_callback(
         '/href="(\/[^"]*)"/i',
