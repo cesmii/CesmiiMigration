@@ -30,6 +30,8 @@ const {
 const DYNAMIC_SECTIONS = [
   { prefix: '/bio', hsBase: 'https://43818189.hs-sites.com/bio' },
   { prefix: '/news', hsBase: 'https://43818189.hs-sites.com/news' },
+  // Newsletters live in a separate HubSpot blog (id 214229568301), not in /news.
+  { prefix: '/newsletter', hsBase: 'https://43818189.hs-sites.com/newsletter' },
   { prefix: '/projects', hsBase: 'https://43818189.hs-sites.com/projects' },
   { prefix: '/project', hsBase: 'https://43818189.hs-sites.com/project' },
   { prefix: '/events', hsBase: 'https://43818189.hs-sites.com/events' },
