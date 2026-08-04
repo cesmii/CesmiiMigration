@@ -40,6 +40,7 @@ function hs_fetch(string $url): string {
         if (str_starts_with($url, 'https://' . $host . '/')) { $allowed = true; break; }
     }
     if (!$allowed) {
+        _hs_status(400);
         return _hs_error('Disallowed URL.');
     }
 
@@ -47,26 +48,50 @@ function hs_fetch(string $url): string {
 
     if (is_file($cache_file) && (time() - filemtime($cache_file)) < HS_CACHE_TTL) {
         $cached = file_get_contents($cache_file);
-        if ($cached !== false && $cached !== '') return $cached;
+        if ($cached !== false && $cached !== '') { _hs_status(200); return $cached; }
     }
 
-    $html = _hs_curl($url);
+    $html = _hs_curl($url, $status);
 
     if ($html === null) {
-        // Prefer stale cache over an error page when upstream is down.
+        // Prefer stale cache over an error page when upstream is down. Content was
+        // still served, so report 200 — callers must not turn this into a 404.
         if (is_file($cache_file)) {
             $stale = file_get_contents($cache_file);
-            if ($stale !== false && $stale !== '') return $stale;
+            if ($stale !== false && $stale !== '') { _hs_status(200); return $stale; }
         }
+        _hs_status($status ?: 502);
         return _hs_error('Content temporarily unavailable.');
     }
 
+    _hs_status(200);
     $fragment = _hs_extract($html, $url);
     @file_put_contents($cache_file, $fragment);
     return $fragment;
 }
 
-function _hs_curl(string $url): ?string {
+/**
+ * Upstream HTTP status of the most recent hs_fetch() call.
+ *
+ * Lets callers distinguish "this page does not exist" (404 — serve a real 404) from
+ * "upstream is having a moment" (timeout/5xx — keep serving the shell with a notice).
+ * Reports 200 whenever content was actually returned, including from stale cache.
+ *
+ * Read this immediately after hs_fetch(): hs_fetch_title() calls hs_fetch() internally
+ * and will overwrite it.
+ */
+function hs_last_status(): int {
+    return _hs_status();
+}
+
+// Backing store for hs_last_status(). Pass an argument to set; call with none to read.
+function _hs_status(?int $set = null): int {
+    static $status = 0;
+    if ($set !== null) $status = $set;
+    return $status;
+}
+
+function _hs_curl(string $url, ?int &$status = null): ?string {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
@@ -81,6 +106,7 @@ function _hs_curl(string $url): ?string {
     $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
+    // $status is returned by reference: 0 on a transport failure (DNS, timeout, TLS).
     return ($body !== false && $status >= 200 && $status < 300) ? $body : null;
 }
 
@@ -241,6 +267,31 @@ function _hs_rewrite_urls(string $html, string $source_url): string {
     $origin = $parts['scheme'] . '://' . $parts['host'];
     $origin_http = 'http://' . $parts['host'];
     $origin_https = 'https://' . $parts['host'];
+
+    // Zeroth: unwrap unrendered HubL link fields. Some posts emit the link *object*
+    // into the href instead of the URL inside it — {{ module.link }} where the template
+    // wanted {{ module.link.href }} — producing:
+    //   href="{type=EXTERNAL, content_id=null, href=https://…, href_with_scheme=https://…}"
+    // (braces arrive percent-encoded, since this runs on DOM-serialised output). Left
+    // alone the browser resolves that as a relative path and the visitor lands on a
+    // proxied 404. Pull the real URL out so the link works.
+    //
+    // This is a workaround for broken upstream content, not a proxy defect — the fix
+    // belongs in the HubSpot module template. It is a no-op once that is corrected.
+    $html = preg_replace_callback(
+        '/href="((?:%7B|\{)[^"]*(?:%7D|\}))"/i',
+        function ($m) {
+            $raw = urldecode($m[1]);
+            if (!preg_match('/href_with_scheme=([^,}]+)/i', $raw, $mm)
+                && !preg_match('/[,{]\s*href=([^,}]+)/i', $raw, $mm)) {
+                return $m[0];
+            }
+            $url = trim($mm[1]);
+            if ($url === '' || strcasecmp($url, 'null') === 0) return $m[0];
+            return 'href="' . htmlspecialchars($url, ENT_QUOTES) . '"';
+        },
+        $html
+    );
 
     // First: rewrite absolute and protocol-relative HubSpot links to local relative paths
     // (skip URLs in HS_NO_REWRITE)
