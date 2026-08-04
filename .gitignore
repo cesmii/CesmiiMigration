@@ -1,5 +1,6 @@
 node_modules/
 out/
+.last-build
 .env
 .DS_Store
 *.pdf
