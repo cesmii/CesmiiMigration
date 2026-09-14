@@ -2,9 +2,9 @@
 /**
  * build.js — Static site generator
  *
- * Reads gloomap.xml, generates a complete static site in out/.
- * Each nav item gets out/{path}/index.html with the full shell.
- * HubSpot content is loaded via iframe at visit time — no server needed at runtime.
+ * Reads gloomap.xml, generates a complete site in out/.
+ * Each linked nav item gets out/{path}/index.php with the full shell; the page
+ * body is fetched from HubSpot at request time by proxy.php.
  *
  * Usage:
  *   node build.js          # build once
@@ -18,7 +18,6 @@ const { loadNavFromGloomap } = require('./lib/gloomap-parser');
 const {
   renderShell,
   renderProxyContent,
-  renderStaticContent,
   renderNotFound,
   renderPlaceholder,
   renderDynamicHandler,
@@ -40,10 +39,9 @@ const DYNAMIC_SECTIONS = [
   { prefix: '/sm-interoperability-platform', hsBase: 'https://43818189.hs-sites.com/sm-interoperability-platform' },
 ];
 
-const PROJECT_ROOT = __dirname;
-const OUT_DIR = path.join(PROJECT_ROOT, 'out');
-const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
-const GLOOMAP_PATH = path.join(PROJECT_ROOT, 'gloomap.xml');
+const OUT_DIR = path.join(__dirname, 'out');
+const PUBLIC_DIR = path.join(__dirname, 'public');
+const GLOOMAP_PATH = path.join(__dirname, 'gloomap.xml');
 
 // --- Helpers ---
 
@@ -54,27 +52,18 @@ function write(relPath, html) {
   console.log(`  ${relPath}`);
 }
 
-function contentFor(item) {
-  if (item.type === 'hubspot') return { html: renderProxyContent(item.url), type: 'hubspot' };
-  if (item.type === 'static')  return { html: renderStaticContent(item.url, PROJECT_ROOT), type: 'static' };
-  return { html: renderPlaceholder(item.label), type: 'placeholder' };
-}
-
 // Walk the nav tree and generate a page only for items that have a URL.
 // Items without a URL are nav structure only and produce no output file.
 function generatePages(items, allNavItems) {
   for (const item of items) {
     if (item.url) {
-      const { html, type } = contentFor(item);
-      const filename = type === 'hubspot' ? 'index.php' : 'index.html';
       write(
-        path.join(item.localPath, filename),
+        path.join(item.localPath, 'index.php'),
         renderShell({
           navItems: allNavItems,
           title: item.label,
           currentPath: item.localPath,
-          contentHtml: html,
-          contentType: type,
+          contentHtml: renderProxyContent(item.url),
         })
       );
     }
@@ -102,20 +91,12 @@ async function build() {
   const { homepageUrl, navItems } = await loadNavFromGloomap(GLOOMAP_PATH);
   console.log(`  gloomap: ${navItems.length} top-level nav items`);
 
-  // Homepage (out/index.html)
-  const homepageContent = homepageUrl
-    ? homepageUrl.startsWith('/')
-      ? { html: renderStaticContent(homepageUrl, PROJECT_ROOT), type: 'static' }
-      : { html: renderProxyContent(homepageUrl), type: 'hubspot' }
-    : { html: renderPlaceholder('Homepage'), type: 'placeholder' };
-
-  const homeFile = homepageContent.type === 'hubspot' ? 'index.php' : 'index.html';
-  write(homeFile, renderShell({
+  // Homepage: out/index.php if the root gloomap box has a URL, else a placeholder.
+  write(homepageUrl ? 'index.php' : 'index.html', renderShell({
     navItems,
     title: '',
     currentPath: '/',
-    contentHtml: homepageContent.html,
-    contentType: homepageContent.type,
+    contentHtml: homepageUrl ? renderProxyContent(homepageUrl) : renderPlaceholder('Homepage'),
   }));
 
   // Dynamic section handler (out/dynamic.php — nginx @dynamic fallback)

@@ -4,12 +4,9 @@
   "description": "CESMII website framework — static build served by nginx",
   "scripts": {
     "build": "node build.js",
-    "dev": "node build.js && npx serve out -p 3000 --no-clipboard"
+    "dev": "node build.js && php -S 127.0.0.1:8080 -t out tools/router.php"
   },
   "dependencies": {
     "xml2js": "^0.6.2"
-  },
-  "devDependencies": {
-    "serve": "^14.2.4"
   }
 }

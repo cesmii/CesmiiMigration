@@ -6,12 +6,55 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initDebug();
   initNavToggle();
   initDropdowns();
   initScrollEffect();
   initFilterHighlight();
   initHubSpotLinkRewrite();
 });
+
+/**
+ * Debug mode: ?debug=true in the query string outlines proxied HubSpot content
+ * and labels it with the URL it was fetched from (data-source on .content-proxy),
+ * so it is obvious what is content and what is site framework. Links whose href
+ * the proxy rewrote carry data-hs-original; in debug mode they get a dotted red
+ * underline and a tooltip showing the original URL.
+ *
+ * The query string is the only switch: no parameter, no debug mode. So that it
+ * survives clicking through the site, same-site links get ?debug=true appended
+ * at click time. Add further debug-only behaviour here.
+ */
+function initDebug() {
+  if (new URLSearchParams(location.search).get('debug') !== 'true') return;
+
+  document.documentElement.classList.add('debug');
+  document.querySelectorAll('a[data-hs-original]').forEach(debugLabelLink);
+
+  // Carry the flag onto the next page. Runs in the capture phase, before the
+  // HubSpot link handler below, which preserves the query string when it
+  // turns a HubSpot-domain link into a local one.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href]');
+    if (!a || a.target === '_blank') return;
+    try {
+      var url = new URL(a.getAttribute('href'), location.href);
+      if (url.origin !== location.origin && url.hostname !== '43818189.hs-sites.com') return;
+      if (url.searchParams.get('debug') === 'true') return;
+      url.searchParams.set('debug', 'true');
+      a.setAttribute('href', url.toString());
+    } catch (_) {}
+  }, true);
+}
+
+// Tooltip on a rewritten link showing where it originally pointed (debug mode only).
+function debugLabelLink(a) {
+  if (!document.documentElement.classList.contains('debug')) return;
+  var orig = a.getAttribute('data-hs-original');
+  if (!orig || a.getAttribute('data-hs-labelled')) return;
+  a.setAttribute('data-hs-labelled', '1');
+  a.title = 'Original: ' + orig + (a.title ? '\n' + a.title : '');
+}
 
 function initNavToggle() {
   const toggle = document.querySelector('.nav-toggle');
@@ -97,7 +140,9 @@ function initHubSpotLinkRewrite() {
     try {
       var url = new URL(href, location.origin);
       if (url.hostname === HS_HOST) {
+        if (!a.hasAttribute('data-hs-original')) a.setAttribute('data-hs-original', href);
         a.setAttribute('href', url.pathname + url.search + url.hash);
+        debugLabelLink(a);
       }
     } catch (_) {}
   }

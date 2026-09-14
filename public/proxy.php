@@ -104,7 +104,6 @@ function _hs_curl(string $url, ?int &$status = null): ?string {
     ]);
     $body   = curl_exec($ch);
     $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     // $status is returned by reference: 0 on a transport failure (DNS, timeout, TLS).
     return ($body !== false && $status >= 200 && $status < 300) ? $body : null;
@@ -265,8 +264,15 @@ function _hs_scope_css(string $css): string {
 function _hs_rewrite_urls(string $html, string $source_url): string {
     $parts  = parse_url($source_url);
     $origin = $parts['scheme'] . '://' . $parts['host'];
-    $origin_http = 'http://' . $parts['host'];
-    $origin_https = 'https://' . $parts['host'];
+
+    // Remember every <a>'s original href so debug mode (?debug=true) can show what
+    // was rewritten. The attribute name must not contain 'href=' or the passes below
+    // would rewrite it too. Links whose href ends up unchanged lose it again at the end.
+    $html = preg_replace(
+        '/<a\b([^>]*?)\shref="([^"]*)"/i',
+        '<a$1 data-hs-original="$2" href="$2"',
+        $html
+    );
 
     // Zeroth: unwrap unrendered HubL link fields. Some posts emit the link *object*
     // into the href instead of the URL inside it — {{ module.link }} where the template
@@ -388,6 +394,15 @@ function _hs_rewrite_urls(string $html, string $source_url): string {
     $html = preg_replace(
         '/href="(?!https?:\/\/|\/\/|\/|#|mailto:|tel:|javascript:)([^"\/]+\.[a-z]{2,}(?:\/[^"]*)?)"/i',
         'href="https://$1"',
+        $html
+    );
+
+    // Drop the original-href marker from links that were not actually rewritten.
+    $html = preg_replace_callback(
+        '/<a\b[^>]*?\sdata-hs-original="([^"]*)"\shref="([^"]*)"/i',
+        fn($m) => $m[1] === $m[2]
+            ? str_replace(' data-hs-original="' . $m[1] . '"', '', $m[0])
+            : $m[0],
         $html
     );
 

@@ -2,10 +2,9 @@
  * theme-bridge.css
  *
  * Styles for the site chrome only: top-bar, header, navigation (desktop + mobile),
- * footer, and the content area that holds proxied or static page content.
+ * footer, and the content area that holds the proxied HubSpot page content.
  *
  * HubSpot page content is fetched server-side and injected into .content-proxy.
- * Static page content is injected into .content-static and can add its own styles.
  */
 
 /* === Reset & base === */
@@ -24,6 +23,9 @@
   --color-text:         #213343;
   --color-text-muted:   #6e7a91;
   --color-border:       #e9eff4;
+  /* Nav entries with no URL in the gloomap. Deliberately loud so gaps are
+     obvious while the site is being mapped. Change to a muted grey for launch. */
+  --color-unlinked:     #ff6b6b;
 
   --max-width:          1140px;
   --header-height:      90px;
@@ -126,7 +128,7 @@ html, body {
 }
 
 /* === Shell layout ===
-   Full-viewport flex column so the iframe fills exactly the space
+   Full-viewport flex column so the content area fills exactly the space
    between chrome top and footer bottom. */
 
 .site-body {
@@ -284,7 +286,7 @@ html, body {
 
 .nav-label {
   padding: 0.45rem 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-unlinked);
   font-size: 0.84rem;
   font-weight: 600;
   cursor: default;
@@ -350,7 +352,7 @@ html, body {
 .dropdown-menu .nav-label {
   display: block;
   padding: 0.55rem 1.25rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-unlinked);
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
@@ -399,20 +401,6 @@ html, body {
   isolation: isolate;
 }
 
-.content-static {
-  flex: 1;
-  /* No padding or max-width here — each static page fragment manages its own
-     internal layout so full-width hero sections can reach edge to edge.
-     Text-heavy pages (privacy, etc.) should wrap their content in a .page-prose div. */
-}
-
-/* Utility wrapper for prose-style static pages (privacy statement, etc.) */
-.page-prose {
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 3rem 1.5rem;
-}
-
 .content-not-found,
 .content-placeholder,
 .content-error {
@@ -453,6 +441,40 @@ html, body {
 .btn-primary:hover {
   background: var(--color-accent-hover);
   color: var(--color-white);
+}
+
+/* === Debug mode (?debug=true, see initDebug in app.js) === */
+
+.debug .content-proxy {
+  position: relative;
+  outline: 2px dotted #e53935;
+  outline-offset: -2px;
+}
+
+.debug .content-proxy::before {
+  content: attr(data-source);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background: #e53935;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.5rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Links whose href the proxy rewrote (original kept in data-hs-original). */
+.debug .content-proxy a[data-hs-original] {
+  text-decoration: underline dotted #e53935 !important;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 /* === Footer === */

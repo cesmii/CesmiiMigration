@@ -27,12 +27,7 @@ Page Label
 #https://page-url-here
 ```
 
-Two URL types are supported:
-
-| Prefix | Meaning | Example |
-|--------|---------|---------|
-| `#https://...` | HubSpot page — fetched server-side and injected into the shell | `#https://43818189.hs-sites.com/our-story` |
-| `#/path` | Local static file in this repo | `#/index.html` |
+The URL is a page on the HubSpot site, for example `#https://43818189.hs-sites.com/our-story`. It is fetched server-side and injected into the shell. A few other CESMII hosts (the membership hub, connect.cesmii.org) are allowed too.
 
 If a box has no URL line, it appears in the navigation as a label but no page is generated for it. This lets you build out the navigation structure ahead of the content — placeholder items show in dropdown menus in a dimmed style.
 
@@ -48,22 +43,18 @@ There is no Node.js server running in production. The build produces HTML and PH
 
 ---
 
-## Content: HubSpot vs. static pages
+## Content lives in HubSpot
 
-**HubSpot pages** are the default. The content team creates and manages these in HubSpot's page editor. When a visitor loads the page, our server fetches the HubSpot content, strips HubSpot's own chrome, and injects the body into our shell. The content team is responsible for ensuring HubSpot page templates do not render HubSpot's own header/footer (since we supply those).
+The content team creates and manages every page in HubSpot's page editor. When a visitor loads a page, our server fetches the HubSpot content, strips HubSpot's own header, footer, and nav, and injects the body into our shell. HubSpot's page CSS is kept but scoped so it cannot restyle our chrome.
 
-**Static pages** are HTML files stored in `public/` in this repo. They are injected directly into the page shell at build time. Static pages are appropriate for content that doesn't need HubSpot's CMS tooling, such as a Privacy Statement, a custom landing page, or the homepage.
-
----
-
-## The homepage
-
-The homepage is currently a static page (`public/index.html`). It is referenced in `gloomap.xml` on the root box:
+The homepage is a HubSpot page too. It is referenced on the root box in `gloomap.xml`:
 
 ```
 cesmii.org
-#/index.html
+#https://43818189.hs-sites.com/index
 ```
+
+**News, events, bios, and other multi-page sections** are not listed in the gloomap page by page. A short list of path prefixes in `build.js` (`/news`, `/events`, `/bio`, …) is handed to a catch-all handler that proxies whatever HubSpot has at the same path. The Impact menu items are ordinary gloomap entries that point at News tag pages, so they act as tag filters on the news blog.
 
 ---
 
@@ -76,22 +67,12 @@ cesmii.org
 | `public/proxy.php` | Server-side HubSpot content proxy (included by generated PHP pages) |
 | `public/css/theme-bridge.css` | All styles for the nav shell (header, footer, chrome) |
 | `public/js/app.js` | Interactivity for the shell (mobile nav, dropdowns, scroll effects) |
-| `public/images/` | Logo and shared image assets |
+| `public/images/` | Site logo |
 | `nginx-example.config` | Reference nginx config for production deployment |
 | `deploy.sh` | Cron-driven deploy script — git pull + conditional rebuild |
+| `tools/gloomap-viewer.html` | Site map viewer — see below |
 | `TODO.md` | Deferred tasks and known pre-launch items |
 | `out/` | Generated site — served by nginx (not committed to git) |
-
----
-
-## Local development
-
-```bash
-npm install       # first time only
-npm run dev       # build + start local server at http://localhost:3000
-```
-
-Note: the site uses absolute asset paths (`/css/...`, `/js/...`) so it must be served over HTTP — opening HTML files directly in a browser won't work.
 
 ---
 
@@ -103,12 +84,34 @@ See **`TODO.md`** for the full list.
 
 ## Build and deploy
 
-### Local development
+### Testing the site on a Mac (no developer tools needed)
+
+1. Get the repo onto the Mac: either **Code → Download ZIP** on GitHub and unzip it, or `git clone` it.
+2. Open the folder in Finder and double-click **`start-test-server.command`**.
+   If macOS says it cannot be opened, right-click it and choose **Open**.
+3. A Terminal window opens, installs anything missing (Homebrew, Node.js, PHP — this asks for your Mac password the first time), builds the site, and opens it at http://127.0.0.1:8080/.
+4. Leave that window open while testing. Press **Ctrl+C** in it, or close it, to stop.
+
+Pages pull their content live from HubSpot, so the first load of each page takes a moment. Site search is the one thing that does not work locally.
+
+Add `?debug=true` to any page address (for example http://127.0.0.1:8080/?debug=true) to outline the HubSpot content in dotted red, labelled with the HubSpot address it was fetched from, so it is clear what comes from HubSpot and what is the site framework. Links the framework has rewritten get a dotted red underline; hover one to see where it originally pointed. It follows you as you click around the site. To turn it off, remove `?debug=true` from the address. This works on the live site too.
+
+While the server is running, http://127.0.0.1:8080/sitemap shows the site map: every nav entry, the page it points to, and which entries are still unlinked.
+
+To pick up a new `gloomap.xml` or code change, stop the server and double-click the script again.
+
+### Local development (developers)
 
 ```bash
 npm install       # first time only
-npm run dev       # build + start local server at http://localhost:3000
+npm run dev       # build + serve at http://127.0.0.1:8080/ with PHP, so HubSpot content loads
 ```
+
+`tools/router.php` makes PHP's built-in server follow the same rules as nginx: `index.php`, then `index.html`, then `dynamic.php`. It does not proxy `/_hcms/`, so HubSpot search results do not work locally.
+
+### Checking the site map
+
+With the dev server running, open http://127.0.0.1:8080/sitemap. It shows `gloomap.xml` as a tree: the path each entry will get, the HubSpot page it proxies, and which entries are still unlinked. You can also drop a fresh Gloomaps export onto the page to preview it before committing. This route exists only on the dev server, not on the live site.
 
 ### Production deployment
 
@@ -135,5 +138,4 @@ The full repo is checked out at `/var/www/cesmii/`. nginx serves the `out/` subd
 | Page content, layouts, campaigns | Content team (HubSpot) |
 | Site navigation structure | Gloomaps → `gloomap.xml` |
 | Chrome styles (header, footer) | This repo |
-| Static pages (homepage, privacy, etc.) | This repo |
 | Build and deployment | Developer |
