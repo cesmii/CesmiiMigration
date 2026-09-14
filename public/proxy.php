@@ -27,7 +27,10 @@ const HS_PATH_MAP = [
     '/smec'               => '/about/sm-executive-council',
     '/members'            => '/membership/members',
 ];
-const HS_CACHE_TTL     = 3600;  // seconds; cached in system temp dir
+// How long a fetched HubSpot page is reused before fetching again, in seconds.
+// 0 = no caching: every request fetches live from HubSpot (slower, always current).
+// Any build also invalidates whatever is cached. Ramp up after launch, e.g. 900.
+const HS_CACHE_TTL     = 0;
 const HS_FETCH_TIMEOUT = 10;    // curl timeout in seconds
 
 /**
@@ -77,7 +80,7 @@ function hs_fetch(string $url): string {
  * having to delete files (which the deploy user often can't — PHP-FPM owns them).
  */
 function _hs_cache_fresh(string $file): bool {
-    if (!is_file($file)) return false;
+    if (HS_CACHE_TTL <= 0 || !is_file($file)) return false;
     $mtime = filemtime($file);
     return (time() - $mtime) < HS_CACHE_TTL && $mtime >= filemtime(__FILE__);
 }
@@ -447,8 +450,9 @@ function _hs_extract_title(string $html): string {
 
 /**
  * Return the page title for a HubSpot URL.
- * Reads from a sidecar cache written by hs_fetch(). Triggers a fresh fetch
- * (and sidecar write) if the cache is absent or stale.
+ * Reads the sidecar written by the most recent hs_fetch() of that URL. Callers
+ * (dynamic.php) always call hs_fetch() first, so the sidecar is as fresh as the
+ * content just served; only fetch if it is missing altogether.
  */
 function hs_fetch_title(string $url): string {
     $allowed = false;
@@ -457,7 +461,7 @@ function hs_fetch_title(string $url): string {
     }
     if (!$allowed) return '';
     $title_file = sys_get_temp_dir() . '/cesmii_' . md5($url) . '_title.txt';
-    if (_hs_cache_fresh($title_file)) {
+    if (is_file($title_file)) {
         $t = file_get_contents($title_file);
         if ($t !== false) return $t;
     }

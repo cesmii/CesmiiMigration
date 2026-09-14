@@ -101,7 +101,10 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/proxy.php';
 echo hs_fetch('https://43818189.hs-sites.com/page-slug');
 ```
 
-`hs_fetch()` caches results in the system temp dir as `cesmii_<md5>.html` for 1 hour.
+`hs_fetch()` caches results in the system temp dir as `cesmii_<md5>.html` for
+`HS_CACHE_TTL` seconds, the flag at the top of proxy.php. It is currently `0`, meaning no
+caching: every request fetches live so content editors always see their latest HubSpot
+changes. Raise it (e.g. 900) once the site is stable.
 A cache entry is also treated as stale if it is older than `out/proxy.php`, which every
 build rewrites, so a deploy invalidates the cache without deleting anything. That matters
 because PHP-FPM owns the files and the deploy user cannot remove them from sticky `/tmp`.

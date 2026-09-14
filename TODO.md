@@ -14,8 +14,9 @@ for standard HubSpot templates but may need adjustment as real pages are linked:
   if needed.
 - HubSpot `srcset` attributes on `<img>` are not yet rewritten to absolute URLs — only `src`
   and `href` are handled. Add a `srcset` rewrite pass if responsive images break.
-- The 1-hour disk cache (`HS_CACHE_TTL`) is invalidated by every build, since entries
-  older than `out/proxy.php` are treated as stale.
+- `HS_CACHE_TTL` at the top of proxy.php is `0` (no caching) during the migration so
+  HubSpot edits show immediately. Raise it after launch; every build also invalidates
+  the cache, since entries older than `out/proxy.php` are treated as stale.
 
 ### Link the rest of the nav
 Membership, most of Our Focus, and RFP / Project Submissions still have no HubSpot URL
