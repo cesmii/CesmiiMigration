@@ -54,6 +54,8 @@ cesmii.org
 #https://43818189.hs-sites.com/index
 ```
 
+**Caching is currently off.** The server can remember each HubSpot page for a while instead of fetching it on every visit, which makes pages faster. That is switched off during the migration so that an edit in HubSpot shows on the site immediately. When it is switched back on, HubSpot edits can take up to the cache time to appear. The switch is `HS_CACHE_TTL` at the top of `public/proxy.php`, in seconds; `0` means off.
+
 **News, events, bios, and other multi-page sections** are not listed in the gloomap page by page. A short list of path prefixes in `build.js` (`/news`, `/events`, `/bio`, …) is handed to a catch-all handler that proxies whatever HubSpot has at the same path. The Impact menu items are ordinary gloomap entries that point at News tag pages, so they act as tag filters on the news blog.
 
 ---
