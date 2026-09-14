@@ -64,9 +64,6 @@ fi
 say "Building the site"
 node build.js || fail "The build failed. See the messages above."
 
-# Clear cached HubSpot pages so you see current content.
-rm -f "${TMPDIR:-/tmp}"/cesmii_* /tmp/cesmii_* 2>/dev/null || true
-
 # --- 5. Serve --------------------------------------------------------------
 if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then
     fail "Port $PORT is already in use. Is the test server already running? Close that window first."

@@ -81,9 +81,8 @@ if [ -z "$NODE" ]; then
     exit 1
 fi
 
-echo "$STAMP Clearing proxy cache..."
-rm -f /tmp/cesmii_*.html /tmp/cesmii_*_title.txt
-
+# No cache clearing needed: proxy.php treats cache entries older than the
+# freshly built out/proxy.php as stale, so a build invalidates them.
 echo "$STAMP Building..."
 "$NODE" build.js
 

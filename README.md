@@ -96,7 +96,7 @@ Pages pull their content live from HubSpot, so the first load of each page takes
 
 Add `?debug=true` to any page address (for example http://127.0.0.1:8080/?debug=true) to outline the HubSpot content in dotted red, labelled with the HubSpot address it was fetched from, so it is clear what comes from HubSpot and what is the site framework. Links the framework has rewritten get a dotted red underline; hover one to see where it originally pointed. It follows you as you click around the site. To turn it off, remove `?debug=true` from the address. This works on the live site too.
 
-While the server is running, http://127.0.0.1:8080/sitemap shows the site map: every nav entry, the page it points to, and which entries are still unlinked.
+http://127.0.0.1:8080/sitemap shows the site map: every nav entry, the page it points to, and which entries are still unlinked.
 
 To pick up a new `gloomap.xml` or code change, stop the server and double-click the script again.
 
@@ -111,7 +111,7 @@ npm run dev       # build + serve at http://127.0.0.1:8080/ with PHP, so HubSpot
 
 ### Checking the site map
 
-With the dev server running, open http://127.0.0.1:8080/sitemap. It shows `gloomap.xml` as a tree: the path each entry will get, the HubSpot page it proxies, and which entries are still unlinked. You can also drop a fresh Gloomaps export onto the page to preview it before committing. This route exists only on the dev server, not on the live site.
+Open `/sitemap` on the dev server or on the live site. It shows `gloomap.xml` as a tree: the path each entry will get, the HubSpot page it proxies, and which entries are still unlinked. You can also drop a fresh Gloomaps export onto the page to preview it before committing. The page and the XML it reads are copied into `out/` by the build, so they are public on the live site.
 
 ### Production deployment
 

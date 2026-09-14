@@ -46,7 +46,7 @@ than its own generated path. Use it sparingly; prefer fixing the gloomap.
 | `public/js/app.js` | Client-side nav interactivity (mobile toggle, dropdowns, scroll) |
 | `nginx-example.config` | Reference nginx config for production (HTTP redirect + HTTPS) |
 | `deploy.sh` | Cron-driven deploy script — git pull + conditional rebuild |
-| `tools/gloomap-viewer.html` | Dev tool: renders `gloomap.xml` as a tree showing what's linked (dev server `/sitemap`) |
+| `tools/gloomap-viewer.html` | Site map viewer; the build copies it to `out/sitemap/` and `gloomap.xml` to `out/` |
 | `tools/router.php` | Router for PHP's built-in server so `npm run dev` behaves like nginx |
 | `start-test-server.command` | Double-click script for non-technical Mac users: installs deps, builds, serves |
 
@@ -59,7 +59,7 @@ than its own generated path. Use it sparingly; prefer fixing the gloomap.
 - Linked entries → `out/{path}/index.php`
 - Entries without URLs → nothing written, but the entry still appears in the nav.
 - Homepage → `out/index.php` from the root box's URL (or a placeholder `index.html` if unset).
-- `out/404.html` and `out/dynamic.php` are always written.
+- `out/404.html`, `out/dynamic.php`, `out/sitemap/index.html`, and `out/gloomap.xml` are always written.
 - The header, nav, and footer markup lives in one place: `renderPage()` in
   `lib/shell-renderer.js`. Both the build-time shell and `dynamic.php` use it.
 - CSS and JS URLs carry a `?v=<build timestamp>` so browsers refetch after a deploy.
@@ -101,8 +101,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/proxy.php';
 echo hs_fetch('https://43818189.hs-sites.com/page-slug');
 ```
 
-`hs_fetch()` caches results in `/tmp/cesmii_<md5>.html` for 1 hour. On upstream
-failure it serves stale cache rather than an error. Clear cache by deleting those files.
+`hs_fetch()` caches results in the system temp dir as `cesmii_<md5>.html` for 1 hour.
+A cache entry is also treated as stale if it is older than `out/proxy.php`, which every
+build rewrites, so a deploy invalidates the cache without deleting anything. That matters
+because PHP-FPM owns the files and the deploy user cannot remove them from sticky `/tmp`.
+On upstream failure it serves stale cache rather than an error. To force a refresh
+without a code change, run `node build.js` (or `deploy.sh`).
 
 Content extraction (`_hs_extract()`), in order:
 1. Fetches every `<link rel="stylesheet">` the page references and collects inline

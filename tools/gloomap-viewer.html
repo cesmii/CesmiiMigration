@@ -4,13 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!--
-  gloomap-viewer.html — dev tool, not part of the built site.
+  gloomap-viewer.html — the site map viewer.
 
   Shows gloomap.xml as a nav tree with the local path each entry produces and
-  the HubSpot page it proxies. Served by tools/router.php at /sitemap whenever
-  the dev server is running (npm run dev, or start-test-server.command):
-
-      http://127.0.0.1:8080/sitemap
+  the HubSpot page it proxies. build.js copies it to out/sitemap/index.html and
+  gloomap.xml to out/gloomap.xml, so it is available at /sitemap on the dev
+  server and on the live site.
 
   Opened as a plain file it cannot read gloomap.xml, so drop the file onto the
   page instead. The three config blocks in the script mirror build.js,

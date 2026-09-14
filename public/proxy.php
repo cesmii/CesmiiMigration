@@ -46,7 +46,7 @@ function hs_fetch(string $url): string {
 
     $cache_file = sys_get_temp_dir() . '/cesmii_' . md5($url) . '.html';
 
-    if (is_file($cache_file) && (time() - filemtime($cache_file)) < HS_CACHE_TTL) {
+    if (_hs_cache_fresh($cache_file)) {
         $cached = file_get_contents($cache_file);
         if ($cached !== false && $cached !== '') { _hs_status(200); return $cached; }
     }
@@ -68,6 +68,18 @@ function hs_fetch(string $url): string {
     $fragment = _hs_extract($html, $url);
     @file_put_contents($cache_file, $fragment);
     return $fragment;
+}
+
+/**
+ * A cache file is fresh if it is younger than HS_CACHE_TTL *and* newer than the
+ * last build. Every build rewrites out/proxy.php, so its mtime marks the build;
+ * comparing against it invalidates the whole cache on deploy without anyone
+ * having to delete files (which the deploy user often can't — PHP-FPM owns them).
+ */
+function _hs_cache_fresh(string $file): bool {
+    if (!is_file($file)) return false;
+    $mtime = filemtime($file);
+    return (time() - $mtime) < HS_CACHE_TTL && $mtime >= filemtime(__FILE__);
 }
 
 /**
@@ -445,7 +457,7 @@ function hs_fetch_title(string $url): string {
     }
     if (!$allowed) return '';
     $title_file = sys_get_temp_dir() . '/cesmii_' . md5($url) . '_title.txt';
-    if (is_file($title_file) && (time() - filemtime($title_file)) < HS_CACHE_TTL) {
+    if (_hs_cache_fresh($title_file)) {
         $t = file_get_contents($title_file);
         if ($t !== false) return $t;
     }

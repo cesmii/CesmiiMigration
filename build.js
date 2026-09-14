@@ -99,6 +99,12 @@ async function build() {
     contentHtml: homepageUrl ? renderProxyContent(homepageUrl) : renderPlaceholder('Homepage'),
   }));
 
+  // Site map viewer (out/sitemap/) and the gloomap it reads (out/gloomap.xml)
+  fs.mkdirSync(path.join(OUT_DIR, 'sitemap'), { recursive: true });
+  fs.copyFileSync(path.join(__dirname, 'tools', 'gloomap-viewer.html'), path.join(OUT_DIR, 'sitemap', 'index.html'));
+  fs.copyFileSync(GLOOMAP_PATH, path.join(OUT_DIR, 'gloomap.xml'));
+  console.log('  sitemap/index.html, gloomap.xml');
+
   // Dynamic section handler (out/dynamic.php — nginx @dynamic fallback)
   write('dynamic.php', renderDynamicHandler(navItems, DYNAMIC_SECTIONS));
 
