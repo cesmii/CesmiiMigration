@@ -24,11 +24,10 @@ and render as unlinked labels. As HubSpot pages are published, add their `#https
 lines to the gloomap so the entries become navigable.
 
 ### Upstream content fixes that would let proxy.php shrink
-Two blocks in `_hs_rewrite_urls()` exist only to patch HubSpot content and can be
+One block in `_hs_rewrite_urls()` exists only to patch HubSpot content and can be
 deleted once the source is fixed:
 - Unrendered HubL link fields (`href="{type=EXTERNAL, …}"`) — fix the module template
   to output `{{ module.link.href }}`.
-- Newsletter filter links pointing at the wrong blog — fix the shared filter bar markup.
 
 ### Re-export from Gloomaps
 Recent nav changes were made by hand-editing `gloomap.xml`. The Gloomaps diagram is now

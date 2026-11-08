@@ -206,7 +206,7 @@ Content extraction (`_hs_extract()`), in order:
 3. `_hs_rewrite_urls()` rewrites links: absolute HubSpot page links become local paths,
    flat HubSpot paths are remapped onto the nav hierarchy (see "Link remapping" below), root-relative `src`
    and asset `href`s become absolute HubSpot URLs. It also patches known upstream
-   content bugs (unrendered HubL link fields, newsletter filter links) — each is
+   content bugs (unrendered HubL link fields) — each is
    commented inline with why.
 
 `hs_last_status()` reports the upstream HTTP status of the last fetch so `dynamic.php`
