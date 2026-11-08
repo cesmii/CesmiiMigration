@@ -2,11 +2,11 @@
 // Dev router for PHP's built-in server (`npm run dev`, start-test-server.command).
 // Mimics the nginx rules in nginx-example.config:
 //   try index.php, then index.html, then fall through to dynamic.php.
-//   proxy.php is never served directly.
+//   proxy.php and hs-path-map.php are never served directly.
 $root = $_SERVER['DOCUMENT_ROOT'];
 $uri  = rawurldecode(strtok($_SERVER['REQUEST_URI'], '?'));
 
-if ($uri === '/proxy.php') { http_response_code(404); exit; }
+if ($uri === '/proxy.php' || $uri === '/hs-path-map.php') { http_response_code(404); exit; }
 
 $path = $root . $uri;
 if (is_file($path)) {

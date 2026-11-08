@@ -20,8 +20,10 @@ const HS_ALLOWED_SCRIPT_HOSTS = ['unpkg.com'];  // non-HubSpot script hosts to a
 const HS_NO_REWRITE           = [
     'https://membershiphub.cesmii.org/welcome',
 ];
-// HubSpot paths that don't match the local nav hierarchy.
-// After absolute→relative rewriting, these flat paths are remapped to their local equivalents.
+// HubSpot paths that don't match the local nav hierarchy. Most of this map is now
+// generated from gloomap.xml at build time (out/hs-path-map.php); see hs_path_map().
+// Entries here are manual overrides and win over the generated ones. Unlike the
+// generated entries (exact path only), these also remap sub-paths (/members/x).
 const HS_PATH_MAP = [
     '/board-of-directors' => '/about/board-of-directors',
     '/smec'               => '/about/sm-executive-council',
@@ -372,21 +374,20 @@ function _hs_rewrite_urls(string $html, string $source_url): string {
         if ($remapped !== null) $html = $remapped;
     }
 
-    // Remap HubSpot paths to their local nav-hierarchy equivalents (e.g. /smec → /about/sm-executive-council)
-    $html = preg_replace_callback(
-        '/href="(\/[^"]*)"/i',
-        function ($m) {
-            $path = strtok($m[1], '?');
-            $qs   = (strpos($m[1], '?') !== false) ? substr($m[1], strpos($m[1], '?')) : '';
-            foreach (HS_PATH_MAP as $from => $to) {
-                if ($path === $from || str_starts_with($path, $from . '/')) {
-                    return 'href="' . $to . substr($path, strlen($from)) . $qs . '"';
-                }
-            }
-            return $m[0];
-        },
-        $html
-    );
+    // Remap HubSpot paths to their local nav-hierarchy equivalents
+    // (e.g. /meet-the-team → /about/team). Only for content from the main HubSpot
+    // site: a root-relative link on membershiphub or connect.cesmii.org is a page on
+    // that host, not on the HubSpot site.
+    if (($parts['host'] ?? '') === HS_ALLOWED_HOSTS[0]) {
+        $html = preg_replace_callback(
+            '/href="(\/[^"#?]*)([^"]*)"/i',
+            function ($m) {
+                $to = hs_local_path($m[1]);
+                return $to === null ? $m[0] : 'href="' . $to . $m[2] . '"';
+            },
+            $html
+        );
+    }
 
     // Second: rewrite root-relative src to absolute HubSpot URLs (images, scripts, etc.)
     $html = preg_replace_callback(
@@ -422,6 +423,32 @@ function _hs_rewrite_urls(string $html, string $source_url): string {
     );
 
     return $html;
+}
+
+/**
+ * HubSpot page path => local nav path. Generated entries come from out/hs-path-map.php
+ * (written by build.js from gloomap.xml); HS_PATH_MAP entries override them.
+ */
+function hs_path_map(): array {
+    static $map = null;
+    if ($map === null) {
+        $generated = @include __DIR__ . '/hs-path-map.php';
+        $map = is_array($generated) ? $generated : [];
+    }
+    return $map;
+}
+
+/**
+ * Local path for a HubSpot page path, or null if it needs no remapping.
+ * '/meet-the-team' and '/meet-the-team/' both give '/about/team'.
+ */
+function hs_local_path(string $path): ?string {
+    $trimmed = rtrim($path, '/') ?: '/';
+    foreach (HS_PATH_MAP as $from => $to) {
+        if ($trimmed === $from) return $to;
+        if (str_starts_with($path, $from . '/')) return $to . substr($path, strlen($from));
+    }
+    return hs_path_map()[$trimmed] ?? null;
 }
 
 /**

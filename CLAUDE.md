@@ -134,7 +134,7 @@ than its own generated path. Use it sparingly; prefer fixing the gloomap.
 - Linked entries → `out/{path}/index.php`
 - Entries without URLs → nothing written, but the entry still appears in the nav.
 - Homepage → `out/index.php` from the root box's URL (or a placeholder `index.html` if unset).
-- `out/404.html`, `out/dynamic.php`, `out/sitemap/index.html`, and `out/gloomap.xml` are always written.
+- `out/404.html`, `out/dynamic.php`, `out/hs-path-map.php`, `out/sitemap/index.html`, and `out/gloomap.xml` are always written.
 - The header, nav, and footer markup lives in one place: `renderPage()` in
   `lib/shell-renderer.js`. Both the build-time shell and `dynamic.php` use it.
 - CSS and JS URLs carry a `?v=<build timestamp>` so browsers refetch after a deploy.
@@ -204,7 +204,7 @@ Content extraction (`_hs_extract()`), in order:
    HubSpot's built-in blog tag filter, and third-party `<script>`s (HubSpot-hosted and
    `HS_ALLOWED_SCRIPT_HOSTS` scripts are kept). Prefers `<main>`, falls back to `<body>`.
 3. `_hs_rewrite_urls()` rewrites links: absolute HubSpot page links become local paths,
-   `HS_PATH_MAP` remaps flat HubSpot paths onto the nav hierarchy, root-relative `src`
+   flat HubSpot paths are remapped onto the nav hierarchy (see "Link remapping" below), root-relative `src`
    and asset `href`s become absolute HubSpot URLs. It also patches known upstream
    content bugs (unrendered HubL link fields, newsletter filter links) — each is
    commented inline with why.
@@ -215,6 +215,19 @@ sidecar; only `dynamic.php` reads it (gloomap pages get their title from the nav
 If extraction quality is wrong for a specific page, adjust `_hs_extract()` in proxy.php.
 
 ---
+
+## Link remapping
+
+HubSpot pages have flat paths (`/meet-the-team`) but sit deeper in our nav (`/about/team`).
+`buildPathMap()` in `build.js` writes `out/hs-path-map.php` from every gloomap entry that
+links a page on the HubSpot site, so this never needs hand-maintaining. It is used twice:
+`_hs_rewrite_urls()` rewrites links inside HubSpot content to the nav path, and `dynamic.php`
+301-redirects a visitor who lands on the flat path. Paths under a `DYNAMIC_SECTIONS` prefix
+(e.g. `/news/tag/...`) are left alone. If two gloomap boxes link the same HubSpot page, the
+first wins. `HS_PATH_MAP` in proxy.php holds manual overrides only (they also remap sub-paths);
+the three entries there are now duplicated by the generated map and can be removed.
+Remapping applies only to content from the main HubSpot site, not membershiphub or connect.
+nginx blocks direct requests for `hs-path-map.php`, like `proxy.php`.
 
 ## Debug mode
 
