@@ -34,7 +34,7 @@ and the build. Notes for them are in the rest of this file.
 | | Where | Notes |
 |---|---|---|
 | Her Mac | `start-test-server.command` → http://127.0.0.1:8080/ | Real HubSpot content, PHP 8.5 via Homebrew. Site search does not work locally. |
-| Staging | http://migration.cesmii.net (HTTP only, no cert yet) | Repo at `/home/cesmii/apps/CesmiiMigration`, PHP 8.1, deploys via `deploy.sh`. |
+| Staging | http://migration.cesmii.net (HTTP only, no cert yet) | Repo at `/home/cesmii/apps/CesmiiMigration`, PHP 8.5, deploys via `deploy.sh`. |
 | Production | cesmii.org, not cut over yet | `nginx-example.config` is written for it: `/var/www/cesmii`, PHP 8.3, HTTPS. Adjust paths and PHP version when copying to another box. |
 | Git | github.com/cesmii/CesmiiMigration | The old Chad-NextStep fork is dead. |
 | HubSpot site | 43818189.hs-sites.com | Plus membershiphub.cesmii.org (HubSpot memberships) and connect.cesmii.org (HubSpot landing pages). www.cesmii.org is the **old** site and must not be linked from the menu. |
@@ -145,7 +145,12 @@ than its own generated path. Use it sparingly; prefer fixing the gloomap.
 
 - **OS:** Ubuntu 24.04 LTS
 - **nginx** with PHP-FPM 8.1 or newer, with the `curl` and `xml` extensions
-  (staging runs `php8.1-fpm`; `nginx-example.config` names the 8.3 socket, so edit it)
+  (staging runs PHP 8.5; `nginx-example.config` names the 8.3 socket, so edit it).
+  There are **two** `fastcgi_pass` lines (`location ~ \.php$` and `location @dynamic`)
+  and they must match. Staging uses `unix:/run/php/php-fpm.sock`, a symlink to the
+  installed version, so a PHP upgrade doesn't break it. A stale `@dynamic` socket was
+  the cause of the Nov 2026 staging 502s: menu pages worked, every news tag/post/
+  redirect failed.
 - **Node.js** for the build (only needed at build time, not at runtime)
 - The full repo is checked out on the server (not just `out/`). Staging uses
   `/home/cesmii/apps/CesmiiMigration`; the example nginx config assumes `/var/www/cesmii`.
@@ -285,8 +290,9 @@ debug-only behaviour under the same class/function.
 - **`add_header` inheritance in nginx:** a `location` block that defines any `add_header`
   directive does NOT inherit `add_header` from the outer server block. Security headers
   are therefore repeated in every location block that sets headers. This is intentional.
-- **PHP pages need PHP-FPM running** — if pages return 502, check `systemctl status php8.1-fpm`
-  (8.3 on production).
+- **PHP pages need PHP-FPM running** — if pages return 502, check `systemctl status php8.5-fpm`
+  on staging (8.3 on production), and that both `fastcgi_pass` lines point at a socket
+  that exists in `/run/php/`.
 - **Stale deploy lock** — if deploy.sh was killed mid-run, remove `/tmp/cesmii-deploy.lock`
   manually before the next run.
 - **srcset not rewritten** — `hs_rewrite_urls()` handles `src` and `href` but not `srcset`.
