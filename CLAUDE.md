@@ -201,8 +201,9 @@ Content extraction (`_hs_extract()`), in order:
    HubSpot layouts intact without letting HubSpot's CSS touch our header/nav/footer.
    It is the most involved code in the repo.
 2. Strips `<style>`, `<link>`, `<noscript>`, `<header>`, `<footer>`, `<nav>`, `<iframe>`,
-   HubSpot's built-in blog tag filter, and third-party `<script>`s (HubSpot-hosted and
-   `HS_ALLOWED_SCRIPT_HOSTS` scripts are kept). Also strips inline "iframe-only" redirect
+   HubSpot's built-in blog tag filter, and third-party `<script>`s (HubSpot-hosted scripts,
+   including those on the `HS_ALLOWED_HOSTS` custom domains such as connect.cesmii.org,
+   and `HS_ALLOWED_SCRIPT_HOSTS` scripts are kept). Also strips inline "iframe-only" redirect
    scripts (frame check + `location` change): the SM Roadmapping page on connect.cesmii.org
    bounces top-level visitors to the old www.cesmii.org. Prefers `<main>`, falls back to
    `<body>`; also uses `<body>` when visible text remains outside `<main>` (that same page

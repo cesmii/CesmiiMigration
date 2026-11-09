@@ -457,7 +457,8 @@ function hs_local_path(string $path): ?string {
 function _hs_is_hubspot_script(string $src): bool {
     if (str_starts_with($src, '/')) return true;
     $host = parse_url($src, PHP_URL_HOST) ?: '';
-    return str_ends_with($host, '.hubspot.com')
+    return in_array($host, HS_ALLOWED_HOSTS, true)   // HubSpot sites we proxy, incl. custom domains
+        || str_ends_with($host, '.hubspot.com')
         || str_ends_with($host, '.hs-sites.com')
         || str_ends_with($host, 'hubspotusercontent-na1.net')
         || str_ends_with($host, 'hubspotusercontent-eu1.net');

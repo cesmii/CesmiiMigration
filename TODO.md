@@ -14,6 +14,10 @@ for standard HubSpot templates but may need adjustment as real pages are linked:
   if needed.
 - HubSpot `srcset` attributes on `<img>` are not yet rewritten to absolute URLs — only `src`
   and `href` are handled. Add a `srcset` rewrite pass if responsive images break.
+- Check interactive modules (FAQ accordions, tabs, sliders) actually work, not just render.
+  Their JS is a separate script file; if the proxy drops it the markup still shows but
+  clicks do nothing. Example: the FAQs on SM Roadmapping and Membership Hub were dead until
+  scripts from the connect/membershiphub custom domains were allowed.
 - `HS_CACHE_TTL` at the top of proxy.php is `0` (no caching) during the migration so
   HubSpot edits show immediately. Raise it after launch; every build also invalidates
   the cache, since entries older than `out/proxy.php` are treated as stale.
