@@ -117,7 +117,7 @@ than its own generated path. Use it sparingly; prefer fixing the gloomap.
 | `lib/gloomap-parser.js` | Parses gloomap XML into a nav tree |
 | `lib/shell-renderer.js` | Renders the HTML/PHP shell for each page |
 | `public/proxy.php` | PHP function library — `hs_fetch()` fetches and strips HubSpot pages |
-| `public/css/theme-bridge.css` | All chrome styles (header, nav, footer, content areas) |
+| `public/css/theme-bridge.css` | Chrome styles only (header, nav, footer, content-area layout). See "Styling ownership" |
 | `public/js/app.js` | Client-side nav interactivity (mobile toggle, dropdowns, scroll) |
 | `nginx-example.config` | Reference nginx config for production (HTTP redirect + HTTPS) |
 | `deploy.sh` | Cron-driven deploy script — git pull + conditional rebuild |
@@ -218,6 +218,29 @@ Content extraction (`_hs_extract()`), in order:
 can return a real 404 for missing pages. The page `<title>` is cached in a `_title.txt`
 sidecar; only `dynamic.php` reads it (gloomap pages get their title from the nav label).
 If extraction quality is wrong for a specific page, adjust `_hs_extract()` in proxy.php.
+
+---
+
+## Styling ownership
+
+`public/css/theme-bridge.css` styles **only the site chrome**: top bar, header, menu,
+footer, debug mode, and the layout of the content area itself. **HubSpot owns everything
+inside `.content-proxy`**: colours, links, buttons, spacing, typography, animations.
+proxy.php scopes HubSpot's CSS under `.content-proxy`, so it can't touch the chrome;
+this rule is the other half of that.
+
+- Don't add rules to theme-bridge.css that style elements inside `.content-proxy`. If
+  content looks wrong, fix it in the HubSpot theme or template, where it also fixes
+  HubSpot directly.
+- Site-wide consistency (e.g. link colours matching the header) is also set in the
+  HubSpot theme, not overridden here.
+- The only exception is where proxying itself breaks something HubSpot can't fix. Even
+  then, prefer fixing the proxy so HubSpot's own CSS applies. If a CSS rule is
+  unavoidable, make it narrow, no `!important`, no `revert`, with a comment naming the
+  page it fixes.
+- This was cleaned up in Nov 2026: earlier content rules forced every link blue with
+  `!important`, which turned button text browser-default blue (purple once visited)
+  and overrode HubSpot's spacing. Don't reintroduce them.
 
 ---
 

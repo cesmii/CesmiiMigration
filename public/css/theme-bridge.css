@@ -74,59 +74,6 @@ html, body {
   padding: 0;
 }
 
-/* HubSpot content area link styling.
-   Links are blue by default. Underlines only on news detail (blog post) pages.
-   Links that wrap images or are styled as buttons/badges keep their own colors. */
-.content-proxy a {
-  color: #4084ef !important;
-  text-decoration: none !important;
-}
-.content-proxy a:hover {
-  color: #2b47da !important;
-}
-/* Underline links only on blog-post detail pages */
-.content-proxy--blog-post a {
-  text-decoration: underline !important;
-}
-.content-proxy--blog-post a:hover {
-  text-decoration: none !important;
-}
-/* Don't restyle links that wrap images or are styled as buttons/badges */
-.content-proxy a:has(> img),
-.content-proxy a.blog-tag,
-.content-proxy a[class*="btn"],
-.content-proxy a[class*="button"],
-.content-proxy a[class*="cta"] {
-  color: revert !important;
-  text-decoration: none !important;
-}
-
-.content-proxy ul,
-.content-proxy ol {
-  list-style: revert;
-  margin: revert;
-  padding: revert;
-}
-
-.content-proxy h1, .content-proxy h2, .content-proxy h3,
-.content-proxy h4, .content-proxy h5, .content-proxy h6,
-.content-proxy p, .content-proxy blockquote, .content-proxy figure {
-  margin: revert;
-}
-
-.content-proxy img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* HubSpot pages use AOS (Animate On Scroll) which hides elements until JS
-   triggers them. Since we strip scripts, force all AOS elements visible. */
-.content-proxy [data-aos] {
-  opacity: 1 !important;
-  transform: none !important;
-  transition: none !important;
-}
-
 /* === Shell layout ===
    Full-viewport flex column so the content area fills exactly the space
    between chrome top and footer bottom. */
@@ -393,9 +340,9 @@ html, body {
   position: relative;
 }
 
-/* HubSpot content fetched by proxy.php — flows as normal page content.
-   'all: initial' on children prevents HubSpot inline styles from bleeding
-   into the shell (nav, header, footer). */
+/* HubSpot content fetched by proxy.php. Layout only: the content area fills the
+   space between header and footer. Do not style anything inside it here; see
+   "Styling ownership" in CLAUDE.md. */
 .content-proxy {
   flex: 1;
   isolation: isolate;
