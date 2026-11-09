@@ -202,7 +202,11 @@ Content extraction (`_hs_extract()`), in order:
    It is the most involved code in the repo.
 2. Strips `<style>`, `<link>`, `<noscript>`, `<header>`, `<footer>`, `<nav>`, `<iframe>`,
    HubSpot's built-in blog tag filter, and third-party `<script>`s (HubSpot-hosted and
-   `HS_ALLOWED_SCRIPT_HOSTS` scripts are kept). Prefers `<main>`, falls back to `<body>`.
+   `HS_ALLOWED_SCRIPT_HOSTS` scripts are kept). Also strips inline "iframe-only" redirect
+   scripts (frame check + `location` change): the SM Roadmapping page on connect.cesmii.org
+   bounces top-level visitors to the old www.cesmii.org. Prefers `<main>`, falls back to
+   `<body>`; also uses `<body>` when visible text remains outside `<main>` (that same page
+   puts its hero in a drag-and-drop area before `<main>`).
 3. `_hs_rewrite_urls()` rewrites links: absolute HubSpot page links become local paths,
    flat HubSpot paths are remapped onto the nav hierarchy (see "Link remapping" below), root-relative `src`
    and asset `href`s become absolute HubSpot URLs. It also patches known upstream

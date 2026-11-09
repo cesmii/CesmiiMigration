@@ -23,6 +23,17 @@ Membership, most of Our Focus, and RFP / Project Submissions still have no HubSp
 and render as unlinked labels. As HubSpot pages are published, add their `#https://...`
 lines to the gloomap so the entries become navigable.
 
+### SM Roadmapping links to other connect.cesmii.org pages
+**Waiting on marketing.** The SM Roadmapping page (`/our-focus/sm-roadmapping`, from
+connect.cesmii.org) links to two connect.cesmii.org pages that aren't in our nav, so
+the proxy turns them into local paths that 404:
+- "You can view all certified professionals **here**" (FAQ answer to "What is a CESMII
+  Certified Roadmap Professional?") → `/certified-smart-manufacturing-roadmap-professionals`
+- "View Sample Questions" button → `/sm-assessment-help#business-practices-assessment-preview`
+
+Options: add these pages to the gloomap, or have proxy.php leave links on
+connect.cesmii.org / membershiphub pointing at their own site unless the page is in the nav.
+
 ### Upstream content fixes that would let proxy.php shrink
 One block in `_hs_rewrite_urls()` exists only to patch HubSpot content and can be
 deleted once the source is fixed:

@@ -178,7 +178,20 @@ function _hs_extract(string $html, string $source_url): string {
     // Strip third-party scripts unless their host is in HS_ALLOWED_SCRIPT_HOSTS.
     foreach (iterator_to_array($xpath->query('//script')) as $node) {
         $src = $node->getAttribute('src');
-        if ($src === '') continue;                              // inline — keep
+        if ($src === '') {
+            // Inline — keep, except "only show me inside an iframe" redirects.
+            // Some HubSpot pages were built to be iframed into the old
+            // www.cesmii.org and bounce top-level visitors back there, e.g.
+            // connect.cesmii.org/start-your-smart-manufacturing-roadmap-journey:
+            //   if (window.self === window.top) window.location.href = "...";
+            // We render them top-level, so that would always fire.
+            $js = $node->textContent;
+            if (preg_match('/\b(?:window|self|top|parent)\s*[!=]==?\s*(?:window\.)?(?:self|top|parent)\b|\bframeElement\b/', $js)
+                && preg_match('/\blocation\s*(?:\.\s*href\s*)?=(?!=)|\blocation\s*\.\s*(?:replace|assign)\s*\(/', $js)) {
+                $node->parentNode?->removeChild($node);
+            }
+            continue;
+        }
         if (_hs_is_hubspot_script($src)) continue;             // HubSpot CDN — keep
         $host = parse_url($src, PHP_URL_HOST) ?: '';
         if (in_array($host, HS_ALLOWED_SCRIPT_HOSTS, true)) continue;  // whitelisted — keep
@@ -195,6 +208,16 @@ function _hs_extract(string $html, string $source_url): string {
     }
 
     $container = $xpath->query('//main')->item(0) ?? $body;
+
+    // Some templates put drag-and-drop content before <main> (e.g. the
+    // connect.cesmii.org SM Roadmapping page has its hero in a
+    // "dnd_area_header" area outside <main>). If any visible text survives
+    // outside <main> after the chrome strip above, keep the whole body.
+    if ($container !== $body && $body && $xpath->query(
+        '//body//text()[normalize-space()][not(ancestor::main)][not(ancestor::script)]'
+    )->length > 0) {
+        $container = $body;
+    }
 
     if ($container === null) {
         return _hs_error('Could not extract page content.');
