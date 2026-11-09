@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavToggle();
   initDropdowns();
   initScrollEffect();
-  initFilterHighlight();
   initHubSpotLinkRewrite();
 });
 
@@ -97,18 +96,6 @@ function initDropdowns() {
         });
       }
     });
-  });
-}
-
-function initFilterHighlight() {
-  var btns = document.querySelectorAll('.news-filters__btn');
-  if (!btns.length) return;
-  var path = location.pathname.replace(/\/+$/, '') || '/news';
-  btns.forEach(function (btn) {
-    var href = (btn.getAttribute('href') || '').replace(/\/+$/, '');
-    // Strip protocol-relative or absolute HubSpot origin to get local path
-    href = href.replace(/^(?:https?:)?\/\/[^/]+/, '');
-    btn.classList.toggle('is-active', href === path);
   });
 }
 
