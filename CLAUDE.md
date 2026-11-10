@@ -193,6 +193,9 @@ echo hs_fetch('https://43818189.hs-sites.com/page-slug');
 `HS_CACHE_TTL` seconds, the flag at the top of proxy.php. It is currently `0`, meaning no
 caching: every request fetches live so content editors always see their latest HubSpot
 changes. Raise it (e.g. 900) once the site is stable.
+Stylesheets are cached separately (`cesmii_css_<md5>.css`, one day, `_hs_fetch_css()`)
+whatever `HS_CACHE_TTL` is: HubSpot versions their URLs, so this can't show stale
+styling, and fetching 5-15 of them per request was most of the page time (~1-2.5s → ~0.25s).
 A cache entry is also treated as stale if it is older than `out/proxy.php`, which every
 build rewrites, so a deploy invalidates the cache without deleting anything. That matters
 because PHP-FPM owns the files and the deploy user cannot remove them from sticky `/tmp`.

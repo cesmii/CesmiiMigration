@@ -108,6 +108,25 @@ function _hs_status(?int $set = null): int {
     return $status;
 }
 
+/**
+ * Fetches a stylesheet, cached on disk for a day regardless of HS_CACHE_TTL.
+ * Every page pulls 5-15 stylesheets one after another; fetching them live made each
+ * page take seconds. HubSpot puts a version in stylesheet URLs
+ * (/hub_generated/.../1793932647172/template_main.min.css) and publishes a new URL
+ * when the CSS changes, so a long cache never shows stale styling. Like page cache,
+ * a build invalidates it.
+ */
+function _hs_fetch_css(string $url): ?string {
+    $file = sys_get_temp_dir() . '/cesmii_css_' . md5($url) . '.css';
+    if (is_file($file) && time() - filemtime($file) < 86400 && filemtime($file) >= filemtime(__FILE__)) {
+        $css = file_get_contents($file);
+        if ($css !== false) return $css;
+    }
+    $css = _hs_curl($url);
+    if ($css !== null) @file_put_contents($file, $css);
+    return $css;
+}
+
 function _hs_curl(string $url, ?int &$status = null): ?string {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -151,7 +170,7 @@ function _hs_extract(string $html, string $source_url): string {
         $href = $node->getAttribute('href');
         if (!$href) continue;
         if (str_starts_with($href, '/')) $href = $origin . $href;
-        $css = _hs_curl($href);
+        $css = _hs_fetch_css($href);
         if ($css !== null) $css_parts[] = $css;
     }
     foreach (iterator_to_array($xpath->query('//style')) as $node) {
