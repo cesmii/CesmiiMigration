@@ -18,9 +18,26 @@ for standard HubSpot templates but may need adjustment as real pages are linked:
   Their JS is a separate script file; if the proxy drops it the markup still shows but
   clicks do nothing. Example: the FAQs on SM Roadmapping and Membership Hub were dead until
   scripts from the connect/membershiphub custom domains were allowed.
-- `HS_CACHE_TTL` at the top of proxy.php is `0` (no caching) during the migration so
-  HubSpot edits show immediately. Raise it after launch; every build also invalidates
-  the cache, since entries older than `out/proxy.php` are treated as stale.
+
+### Page speed / caching
+**Priority: High — decide before cesmii.org launch**
+
+Every page currently fetches HubSpot live (the HTML plus each stylesheet), so pages
+take 1–3s. Options, in suggested order:
+
+- **Cloudflare Cache Rule** for page HTML with a short edge TTL (5–15 min). The rule
+  must override origin headers, because nginx sends `Cache-Control: no-store` on all
+  PHP responses (`location ~ \.php$` and `@dynamic`). Alternatively, change that header
+  to `public, s-maxage=600`. Exclude `/_hcms/*`, `/hs-search-results` and `?debug=true`.
+  Agree with editors on cache delay vs purging Cloudflare after publishing.
+- **Merge `perf/cache-stylesheets`**: caches HubSpot CSS on the server for a day
+  (~1–2s saved per page in local testing).
+- **`HS_CACHE_TTL`** at the top of proxy.php is `0` (off) so HubSpot edits show
+  immediately. Server-side page cache; every build invalidates it, since entries older
+  than `out/proxy.php` are treated as stale. Probably unnecessary if Cloudflare caches
+  pages, and two cache layers make "why isn't my edit showing" harder to answer.
+
+Our own CSS/JS/images already get a 1-year cache with `?v=` cache-busting.
 
 ### Link the rest of the nav
 Membership, most of Our Focus, and RFP / Project Submissions still have no HubSpot URL
