@@ -121,18 +121,19 @@ html, body {
   color: var(--color-white);
 }
 
-/* Solid button: blue fill, white 15px/600 label, blue-hover on hover. Scoped to
-   the header and mobile menu so it outranks the "a { color: inherit }" reset
-   above without needing to force it. */
+/* Solid button: blue fill, white 15px label, blue-hover on hover. Regular weight
+   and a 1px border: the top bar is small, and 600/2px read as too heavy there.
+   Scoped to the header (which includes the mobile menu) so it outranks the
+   "a { color: inherit }" reset above without needing to force it. */
 .site-header .top-bar-btn {
   display: inline-flex;
   align-items: center;
   background: var(--cesmii-blue);
   color: var(--color-white);
-  border: 2px solid var(--cesmii-blue);
-  padding: 0.3rem 0.875rem;
+  border: 1px solid var(--cesmii-blue);
+  padding: 0.35rem 0.9rem;
   border-radius: var(--cesmii-radius-sm);
-  font-weight: 600;
+  font-weight: 400;
   font-size: 15px;
   line-height: 1.2;
   white-space: nowrap;
