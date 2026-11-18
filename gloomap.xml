@@ -203,7 +203,8 @@ Credentials</text>
               <propd>100%</propd>
               <member>
                 <box>
-                  <text>i3X</text>
+                  <text>SM Profiles
+#http://43818189.hs-sites.com/sm-profiles</text>
                   <propa>#cc9ef2</propa>
                   <propb>#000000</propb>
                   <propc>Lato</propc>
@@ -211,41 +212,30 @@ Credentials</text>
                   <member/>
                 </box>
                 <box>
-                  <text>SM Imperatives</text>
+                  <text>SMIP
+#http://43818189.hs-sites.com/smip</text>
                   <propa>#cc9ef2</propa>
                   <propb>#000000</propb>
                   <propc>Lato</propc>
                   <propd>100%</propd>
-                  <member>
-                    <box>
-                      <text>1. Information Model Standardization</text>
-                      <propa>#cc9ef2</propa>
-                      <propb>#000000</propb>
-                      <propc>Lato</propc>
-                      <propd>100%</propd>
-                      <member/>
-                    </box>
-                    <box>
-                      <text>2. Manufacturing Interoperability Platform</text>
-                      <propa>#cc9ef2</propa>
-                      <propb>#000000</propb>
-                      <propc>Lato</propc>
-                      <propd>100%</propd>
-                      <member/>
-                    </box>
-                    <box>
-                      <text>3. i3X</text>
-                      <propa>#cc9ef2</propa>
-                      <propb>#000000</propb>
-                      <propc>Lato</propc>
-                      <propd>100%</propd>
-                      <member/>
-                    </box>
-                  </member>
+                  <member/>
                 </box>
                 <box>
-                  <text>Marketplace</text>
+                  <text>i3X
+#http://43818189.hs-sites.com/i3x</text>
                   <propa>#cc9ef2</propa>
+                  <propb>#000000</propb>
+                  <propc>Lato</propc>
+                  <propd>100%</propd>
+                  <member/>
+                </box>
+                <box>
+                  <text>Resources
+#http://43818189.hs-sites.com/technology-resources</text>
+                  <propa>#cc9ef2</propa>
+                  <propb>#000000</propb>
+                  <propc>Lato</propc>
+                  <propd>100%</propd>
                   <member/>
                 </box>
               </member>
