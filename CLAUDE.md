@@ -106,6 +106,13 @@ The Impact nav items are just gloomap entries whose URLs are `/news/tag/...` pag
 `NAV_LINK_OVERRIDES` in `lib/shell-renderer.js` makes a nav item link somewhere other
 than its own generated path. Use it sparingly; prefer fixing the gloomap.
 
+**Breadcrumbs** show on every page except home and are built by the wrapper, so HubSpot
+pages shouldn't add their own "← back" links. Gloomap pages use their place in the nav
+(nav labels with no URL show as plain text). Dynamic pages sit under the nav page given
+in `DYNAMIC_PARENTS` in `lib/shell-renderer.js`, with the HubSpot page title last; a
+dynamic section missing from it gets "Home › title". When adding a `DYNAMIC_SECTIONS`
+prefix, add its parent there too. The trail carries schema.org `BreadcrumbList` microdata.
+
 ---
 
 ## Key files

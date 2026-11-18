@@ -343,6 +343,58 @@ html, body {
   position: relative;
 }
 
+/* Breadcrumbs: chrome, built from the gloomap (renderBreadcrumbs in
+   lib/shell-renderer.js) on every page except home. A white strip under the
+   header with a hairline below. Small text: links in dark blue (the design
+   system's colour for small blue text), the current page in ink. */
+.breadcrumbs {
+  flex-shrink: 0;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--cesmii-border-light);
+  font: var(--cesmii-small);
+}
+
+.breadcrumbs ol {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 10px 1.5rem;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0;
+}
+
+.breadcrumbs li {
+  color: var(--cesmii-ink-muted);
+}
+
+.breadcrumbs li + li::before {
+  content: "\203A"; /* › */
+  margin: 0 0.5rem;
+  color: var(--cesmii-ink-muted);
+}
+
+.breadcrumbs a {
+  color: var(--cesmii-blue-dark);
+  text-decoration: none;
+  border-radius: var(--cesmii-radius-sm);
+}
+
+.breadcrumbs a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.breadcrumbs a:focus-visible {
+  outline: 2px solid var(--cesmii-blue-dark);
+  outline-offset: 2px;
+}
+
+.breadcrumbs [aria-current="page"] {
+  color: var(--cesmii-ink);
+}
+
 /* HubSpot content fetched by proxy.php. Layout only: the content area fills the
    space between header and footer. Do not style anything inside it here; see
    "Styling ownership" in CLAUDE.md. */
