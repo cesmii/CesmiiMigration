@@ -118,6 +118,7 @@ than its own generated path. Use it sparingly; prefer fixing the gloomap.
 | `lib/shell-renderer.js` | Renders the HTML/PHP shell for each page |
 | `public/proxy.php` | PHP function library — `hs_fetch()` fetches and strips HubSpot pages |
 | `public/css/theme-bridge.css` | Chrome styles only (header, nav, footer, content-area layout). See "Styling ownership" |
+| `public/css/cesmii-brand.css` | CESMII design system variables (`--cesmii-*`), Jillian's file. Replace wholesale when a new version ships; keep its `@import` line removed (fonts load in `<head>`) |
 | `public/js/app.js` | Client-side nav interactivity (mobile toggle, dropdowns, scroll) |
 | `nginx-example.config` | Reference nginx config for production (HTTP redirect + HTTPS) |
 | `deploy.sh` | Cron-driven deploy script — git pull + conditional rebuild |

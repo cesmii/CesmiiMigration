@@ -1,0 +1,189 @@
+/* =====================================================================
+   cesmii-brand.css  (v1, November 18, 2026)
+   One shared set of CESMII brand styles for every web surface:
+   the HubSpot theme and the migration.cesmii.net site shell.
+
+   Source of truth: CESMII Design System
+   (https://claude.ai/artifact/XL97gVfxbgykVsPCUB1nS2), README and tokens.
+   Decided by Jillian with Olivia, November 18, 2026: Geist everywhere,
+   body text #231f20, small blue labels #2b47da, 8px corners everywhere,
+   no em dashes, applied to both the site shell and the HubSpot theme.
+
+   Status: the HubSpot theme settings were updated to match on Nov 18.
+   For the site shell (public/css/theme-bridge.css), section 3 at the end
+   of this file maps the shell's current variables to these.
+
+   How to read this file (for non-developers):
+   - Lines starting with --cesmii- are "variables": a named value that is
+     set once here and reused everywhere. Change it here, it changes
+     everywhere that uses it.
+   - Everything below the variables is optional ready-made styles
+     (.cesmii-eyebrow, .cesmii-btn, ...) that pages can use.
+   - Variables are prefixed "cesmii-" so they can't clash with the
+     names already used in theme-bridge.css or the HubSpot theme.
+   ===================================================================== */
+
+/* 1. Load the fonts (Geist for everything people read, Geist Mono for code).
+      Arial is the backup if Geist fails to load.
+      Site shell copy: the @import is removed here; lib/shell-renderer.js loads
+      the fonts with <link> tags in <head>, which is faster than @import. */
+
+:root {
+  /* ---------- Color palette (use only these) ---------- */
+  --cesmii-blue:          #4084ef; /* buttons, eyebrows, big type, borders, bands */
+  --cesmii-blue-hover:    #3670cb; /* hover fill for every button */
+  --cesmii-blue-dark:     #2b47da; /* small blue text, links in body copy, badges */
+  --cesmii-cyan:          #00aeef; /* accent for borders and fills, never small text */
+  --cesmii-purple:        #5438d4;
+  --cesmii-purple-deep:   #4d006e;
+  --cesmii-navy:          #151a3d; /* dark sections, footers, dark panels */
+  --cesmii-green:         #6aa342; /* sustainability accents, not small text */
+  --cesmii-green-cta:     #9fb522; /* CTA bars, white text only */
+  --cesmii-ink:           #231f20; /* body text */
+  --cesmii-ink-muted:     #5e5a5b; /* secondary text, captions */
+  --cesmii-border:        #d0d3d8; /* borders, dividers */
+  --cesmii-border-light:  #e2e4e8; /* hairlines on cards */
+  --cesmii-panel:         #f4f5f7; /* fact bars, panels, light sections */
+  --cesmii-white:         #ffffff;
+
+  /* ---------- Type ---------- */
+  --cesmii-font:      "Geist", Arial, Helvetica, sans-serif;
+  --cesmii-font-mono: "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  /* Web type scale (size / weight / line height) */
+  --cesmii-display:  700 56px/1.05 var(--cesmii-font); /* homepage hero only */
+  --cesmii-h1:       700 40px/1.1  var(--cesmii-font);
+  --cesmii-h2:       600 30px/1.15 var(--cesmii-font);
+  --cesmii-h3:       600 22px/1.25 var(--cesmii-font);
+  --cesmii-h4:       600 18px/1.35 var(--cesmii-font);
+  --cesmii-lead:     400 18px/1.6  var(--cesmii-font);
+  --cesmii-body:     400 16px/1.6  var(--cesmii-font);
+  --cesmii-small:    400 14px/1.5  var(--cesmii-font);
+
+  /* ---------- Corners: 8px everywhere (pill only for circles and badges) ---------- */
+  --cesmii-radius-sm:   8px;    /* buttons, form fields, small tiles */
+  --cesmii-radius-md:   8px;    /* feature and content cards */
+  --cesmii-radius-lg:   8px;    /* large panels, section containers */
+  --cesmii-radius-pill: 9999px; /* badges, chips, search fields, circles */
+
+  /* ---------- Spacing ---------- */
+  --cesmii-space-section: 96px;  /* top/bottom padding of a page section */
+  --cesmii-max-width:     1200px;
+}
+
+/* =====================================================================
+   2. Ready-made styles (optional). Each one follows a Design System rule.
+   ===================================================================== */
+
+/* Eyebrow: ALL CAPS, bold, at least 19px, CESMII blue.
+   19px bold is the smallest size where #4084ef stays readable on white. */
+.cesmii-eyebrow {
+  font: 700 19px/1.3 var(--cesmii-font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cesmii-blue);
+  margin: 0 0 12px;
+}
+.cesmii-dark .cesmii-eyebrow { color: var(--cesmii-white); }
+
+/* Headlines: sentence case, near black. */
+.cesmii-display { font: var(--cesmii-display); letter-spacing: -0.02em; color: var(--cesmii-ink); }
+.cesmii-h1 { font: var(--cesmii-h1); letter-spacing: -0.015em; color: var(--cesmii-ink); }
+.cesmii-h2 { font: var(--cesmii-h2); letter-spacing: -0.01em; color: var(--cesmii-ink); }
+.cesmii-h3 { font: var(--cesmii-h3); color: var(--cesmii-ink); }
+.cesmii-lead { font: var(--cesmii-lead); color: var(--cesmii-ink-muted); }
+
+/* Links inside body copy use the darker blue for readability. */
+.cesmii-body a { color: var(--cesmii-blue-dark); }
+
+/* Buttons: CESMII blue, 8px corners, hover #3670cb. */
+.cesmii-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font: 600 15px/1.2 var(--cesmii-font);
+  padding: 14px 24px;
+  border-radius: var(--cesmii-radius-sm);
+  border: 2px solid var(--cesmii-blue);
+  background: var(--cesmii-blue);
+  color: var(--cesmii-white);
+  text-decoration: none;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.cesmii-btn:hover { background: var(--cesmii-blue-hover); border-color: var(--cesmii-blue-hover); color: var(--cesmii-white); }
+.cesmii-btn--outline { background: var(--cesmii-white); color: var(--cesmii-blue); }
+.cesmii-btn--outline:hover { background: var(--cesmii-blue-hover); color: var(--cesmii-white); }
+/* Smaller button for use inside cards (40px tall) */
+.cesmii-btn--card { padding: 9px 14px; font-weight: 500; }
+
+/* "Learn more →" links at the foot of a card */
+.cesmii-card-link { font: 600 16px/1.3 var(--cesmii-font); color: var(--cesmii-blue); text-decoration: none; }
+.cesmii-card-link:hover { color: var(--cesmii-blue-hover); }
+
+/* Cards: white, hairline border, 8px corners, NO shadow, no colored side stripe. */
+.cesmii-card {
+  background: var(--cesmii-white);
+  border: 1px solid var(--cesmii-border-light);
+  border-radius: var(--cesmii-radius-md);
+  overflow: hidden;
+}
+
+/* Small label on a card (category, date). Small blue text uses the darker blue. */
+.cesmii-label {
+  font: 600 13px/1.3 var(--cesmii-font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cesmii-blue-dark);
+}
+
+/* Panels and sections: flat colors only, never gradients. */
+.cesmii-panel { background: var(--cesmii-panel); border-radius: var(--cesmii-radius-lg); }
+.cesmii-section { padding: var(--cesmii-space-section) 0; }
+.cesmii-section--light { background: var(--cesmii-panel); }
+.cesmii-dark { background: var(--cesmii-navy); color: var(--cesmii-white); }
+.cesmii-cta-bar { background: var(--cesmii-green-cta); color: var(--cesmii-white); } /* white text only */
+
+/* Numbered circle: white numeral on solid CESMII blue. */
+.cesmii-number {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px;
+  border-radius: var(--cesmii-radius-pill);
+  background: var(--cesmii-blue);
+  color: var(--cesmii-white);
+  font: 700 20px/1 var(--cesmii-font);
+}
+
+/* Filter buttons (News and Events listings): white with dark text,
+   CESMII blue when active. Matches what the News page already does. */
+.cesmii-filter {
+  display: inline-flex; align-items: center;
+  font: 500 15px/1.2 var(--cesmii-font);
+  padding: 10px 16px;
+  border-radius: var(--cesmii-radius-sm);
+  background: var(--cesmii-white);
+  color: var(--cesmii-ink);
+  border: 1px solid var(--cesmii-border-light);
+  text-decoration: none;
+}
+.cesmii-filter:hover { border-color: var(--cesmii-blue); color: var(--cesmii-blue-dark); }
+.cesmii-filter.is-active { background: var(--cesmii-blue); border-color: var(--cesmii-blue); color: var(--cesmii-white); }
+
+/* Code, IDs and technical values */
+.cesmii-mono, .cesmii-body code { font-family: var(--cesmii-font-mono); }
+
+/* =====================================================================
+   3. Suggested mapping for theme-bridge.css (FOR OLIVIA TO REVIEW)
+   Current value                      ->  Proposed brand value
+   --color-dark       #213343         ->  var(--cesmii-navy)      #151a3d
+   --color-dark-mid   #2d4457         ->  var(--cesmii-navy)      (or panel)
+   --color-accent     #FF5F39 orange  ->  var(--cesmii-blue)      #4084ef
+   --color-accent-hover #E64E2A       ->  var(--cesmii-blue-hover) #3670cb
+   --color-bg-alt     #f9fbfd         ->  var(--cesmii-panel)     #f4f5f7
+   --color-text       #213343         ->  var(--cesmii-ink)       #231f20
+   --color-text-muted #6e7a91         ->  var(--cesmii-ink-muted) #5e5a5b
+   --color-border     #e9eff4         ->  var(--cesmii-border-light) #e2e4e8
+   --radius           12px            ->  var(--cesmii-radius-md) 8px
+   --radius-pill      40px            ->  var(--cesmii-radius-pill)
+   --font-body        DM Sans         ->  var(--cesmii-font)      Geist
+   --font-heading     Plus Jakarta    ->  var(--cesmii-font)      Geist
+   #1c53a3 (buttons, 5 places)        ->  var(--cesmii-blue)
+   linear-gradient(#00aeef, #2b47da)  ->  flat var(--cesmii-blue) (no gradients on web)
+   ===================================================================== */

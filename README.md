@@ -68,6 +68,7 @@ cesmii.org
 | `build.js` | Build script — reads gloomap, generates `out/` |
 | `public/proxy.php` | Server-side HubSpot content proxy (included by generated PHP pages) |
 | `public/css/theme-bridge.css` | All styles for the nav shell (header, footer, chrome) |
+| `public/css/cesmii-brand.css` | CESMII brand colours, fonts and corners, shared with the HubSpot theme |
 | `public/js/app.js` | Interactivity for the shell (mobile nav, dropdowns, scroll effects) |
 | `public/images/` | Site logo |
 | `nginx-example.config` | Reference nginx config for production deployment |

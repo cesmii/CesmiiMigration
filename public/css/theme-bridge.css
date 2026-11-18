@@ -5,6 +5,9 @@
  * footer, and the content area that holds the proxied HubSpot page content.
  *
  * HubSpot page content is fetched server-side and injected into .content-proxy.
+ *
+ * Colours, fonts and corners come from the CESMII design system variables in
+ * cesmii-brand.css (--cesmii-*), loaded before this file.
  */
 
 /* === Reset & base === */
@@ -14,15 +17,20 @@
 }
 
 :root {
-  --color-dark:         #213343;
-  --color-dark-mid:     #2d4457;
-  --color-accent:       #FF5F39;
-  --color-accent-hover: #E64E2A;
+  /* Header and mobile menu background. Still a marketing decision (navy, white or
+     flat blue), so it is set only here. Switching to white also needs dark nav
+     text and a dark logo, since both are white today. */
+  --shell-header-bg:    var(--cesmii-navy);
+
+  --color-dark:         var(--cesmii-navy);
+  --color-accent:       var(--cesmii-blue);
+  --color-accent-hover: var(--cesmii-blue-hover);
   --color-white:        #ffffff;
-  --color-bg-alt:       #f9fbfd;
-  --color-text:         #213343;
-  --color-text-muted:   #6e7a91;
-  --color-border:       #e9eff4;
+  --color-text:         var(--cesmii-ink);
+  --color-text-muted:   var(--cesmii-ink-muted);
+  --color-border:       var(--cesmii-border-light);
+  /* Secondary text and links on navy: the design system's floor. */
+  --color-on-dark-muted: rgba(255, 255, 255, 0.72);
   /* Nav entries with no URL in the gloomap. Deliberately loud so gaps are
      obvious while the site is being mapped. Change to a muted grey for launch. */
   --color-unlinked:     #ff6b6b;
@@ -30,13 +38,12 @@
   --max-width:          1140px;
   --header-height:      90px;
 
-  --radius:             12px;
-  --radius-pill:        40px;
-  --shadow-nav:         0 8px 32px rgba(8, 15, 52, 0.14);
+  --radius:             var(--cesmii-radius-md);
+  --radius-pill:        var(--cesmii-radius-pill);
   --transition:         0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  --font-body:          'DM Sans', system-ui, sans-serif;
-  --font-heading:       'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:          var(--cesmii-font);
+  --font-heading:       var(--cesmii-font);
 }
 
 html, body {
@@ -46,7 +53,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Shell chrome font — scoped so it doesn't override HubSpot content */
+/* Shell chrome font, scoped so it doesn't override HubSpot content */
 .site-header,
 .site-footer,
 .top-bar-row,
@@ -57,7 +64,7 @@ html, body {
   color: var(--color-text);
 }
 
-/* Scoped resets — only apply to the shell chrome, not HubSpot content */
+/* Scoped resets: only apply to the shell chrome, not HubSpot content */
 .site-header a,
 .site-footer a,
 .top-bar-row a {
@@ -101,56 +108,54 @@ html, body {
 }
 
 .top-bar-social a {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--color-on-dark-muted);
   display: flex;
   align-items: center;
-  transition: color var(--transition);
+  padding: 4px;
+  border-radius: var(--cesmii-radius-sm);
+  transition: color var(--transition), background var(--transition);
 }
 
 .top-bar-social a:hover {
-  background: #1c53a3;
+  background: var(--cesmii-blue-hover);
   color: var(--color-white);
 }
 
-.top-bar-btn {
-  background: #00aeef;
+/* Solid button: blue fill, white 15px/600 label, blue-hover on hover. Scoped to
+   the header and mobile menu so it outranks the "a { color: inherit }" reset
+   above without needing to force it. */
+.site-header .top-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  background: var(--cesmii-blue);
   color: var(--color-white);
-  padding: 0.25rem 0.875rem;
-  border-radius: 0;
-  font-weight: 700;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: background var(--transition);
+  border: 2px solid var(--cesmii-blue);
+  padding: 0.3rem 0.875rem;
+  border-radius: var(--cesmii-radius-sm);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background var(--transition), border-color var(--transition);
 }
 
-.top-bar-btn,
-.top-bar-btn:visited,
-.top-bar-btn:hover,
-.top-bar-btn:active {
-  color: #ffffff !important;
+.site-header .top-bar-btn:hover {
+  background: var(--cesmii-blue-hover);
+  border-color: var(--cesmii-blue-hover);
+  color: var(--color-white);
 }
 
-.top-bar-btn:hover {
-  background: #1c53a3;
-}
-
-.top-bar-btn-secondary {
+/* Outline button. On the navy header its resting border and label are white;
+   on hover it fills like the solid button. */
+.site-header .top-bar-btn-secondary {
   background: transparent;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-  color: var(--color-white);
-}
-
-.top-bar-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.7);
-  color: var(--color-white);
+  border-color: var(--color-white);
 }
 
 /* === Header === */
 
 .site-header {
-  background: linear-gradient(135deg, #00aeef, #2b47da);
+  background: var(--shell-header-bg);
   height: var(--header-height);
   position: sticky;
   top: 0;
@@ -208,7 +213,7 @@ html, body {
   align-items: center;
   gap: 0.3rem;
   padding: 0.45rem 0.8rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--cesmii-radius-sm);
   color: rgba(255, 255, 255, 0.82);
   font-family: var(--font-body);
   font-weight: 600;
@@ -260,10 +265,10 @@ html, body {
   top: calc(100% + 6px);
   left: 0;
   min-width: 210px;
-  background: #1c53a3;
-  border-radius: 0;
-  box-shadow: var(--shadow-nav);
-  padding: 0.4rem 0;
+  background: var(--color-white);
+  border: 1px solid var(--cesmii-border-light);
+  border-radius: var(--cesmii-radius-sm);
+  padding: 0.4rem;
   opacity: 0;
   visibility: hidden;
   transform: translateY(6px);
@@ -279,26 +284,23 @@ html, body {
 
 .dropdown-menu a {
   display: block;
-  padding: 0.55rem 1.25rem;
-  color: var(--color-white);
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--cesmii-radius-sm);
+  color: var(--cesmii-ink);
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
   transition: color var(--transition), background var(--transition);
 }
 
-.dropdown-menu a:hover {
-  color: var(--color-white);
-  background: #1c53a3;
-}
-
+.dropdown-menu a:hover,
 .dropdown-menu a.active {
-  color: var(--color-white);
+  color: var(--cesmii-blue-dark);
 }
 
 .dropdown-menu .nav-label {
   display: block;
-  padding: 0.55rem 1.25rem;
+  padding: 0.55rem 0.85rem;
   color: var(--color-unlinked);
   font-size: 0.875rem;
   font-weight: 500;
@@ -363,7 +365,7 @@ html, body {
 
 .content-not-found h1 {
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-text);
   margin-bottom: 0.75rem;
 }
@@ -378,10 +380,11 @@ html, body {
   display: inline-block;
   background: var(--color-accent);
   color: var(--color-white);
-  padding: 0.65rem 1.75rem;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  font-size: 0.9rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: var(--cesmii-radius-sm);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
   transition: background var(--transition);
 }
 
@@ -427,7 +430,7 @@ html, body {
 /* === Footer === */
 
 .site-footer {
-  background: linear-gradient(135deg, #00aeef, #2b47da);
+  background: var(--cesmii-navy);
   color: var(--color-white);
   font-size: 1rem;
   line-height: 1.7;
@@ -471,14 +474,16 @@ html, body {
 }
 
 .footer-col .footer-social a {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--color-on-dark-muted);
   display: flex;
   align-items: center;
-  transition: color var(--transition);
+  padding: 4px;
+  border-radius: var(--cesmii-radius-sm);
+  transition: color var(--transition), background var(--transition);
 }
 
 .footer-col .footer-social a:hover {
-  background: #1c53a3;
+  background: var(--cesmii-blue-hover);
   color: var(--color-white);
 }
 
@@ -508,15 +513,48 @@ html, body {
 }
 
 .footer-col a:hover {
-  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   text-align: center;
   padding: 0.75rem 1.5rem;
   font-size: 0.75rem;
   color: var(--color-white);
+}
+
+/* === Keyboard focus ===
+   White ring on the navy header and footer, dark blue on white (dropdown panel,
+   404 page). Shell elements only: nothing inside .content-proxy. */
+
+.site-header a:focus-visible,
+.site-header button:focus-visible,
+.site-footer a:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+.dropdown-menu a:focus-visible,
+.content-not-found a:focus-visible,
+.content-placeholder a:focus-visible,
+.content-error a:focus-visible {
+  outline: 2px solid var(--cesmii-blue-dark);
+  outline-offset: 2px;
+}
+
+/* Keyboard users: a dropdown opens while focus is inside it, as on hover. */
+.nav-dropdown:focus-within .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Copy of the top-bar links at the bottom of the mobile menu (TOP_BAR_LINKS in
+   shell-renderer.js). Hidden on desktop, where the top bar shows them. */
+.nav-mobile-extras {
+  display: none;
 }
 
 /* === Responsive === */
@@ -531,10 +569,6 @@ html, body {
 
 @media (max-width: 768px) {
   .top-bar-row {
-    display: none;
-  }
-
-  .header-right {
     display: none;
   }
 
@@ -554,9 +588,9 @@ html, body {
     right: 0;
     flex-direction: column;
     align-items: stretch;
-    background: linear-gradient(135deg, #00aeef, #2b47da);
+    background: var(--shell-header-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
     padding: 0.75rem 0 1rem;
-    box-shadow: 0 8px 24px rgba(33, 51, 67, 0.3);
     z-index: 99;
   }
 
@@ -578,7 +612,7 @@ html, body {
     opacity: 1;
     visibility: visible;
     transform: none;
-    box-shadow: none;
+    border: none;
     border-radius: 0;
     padding: 0;
     min-width: 0;
@@ -592,13 +626,30 @@ html, body {
 
   .dropdown-menu a {
     padding: 0.55rem 1.25rem 0.55rem 2.25rem;
-    color: rgba(255, 255, 255, 0.65);
+    border-radius: 0;
+    color: var(--color-on-dark-muted);
     font-size: 0.86rem;
   }
 
-  .dropdown-menu a:hover {
+  .dropdown-menu a:hover,
+  .dropdown-menu a.active {
     background: transparent;
-    color: var(--color-accent);
+    color: var(--color-white);
+  }
+
+  /* The mobile dropdown sits on navy, so its focus ring is white too. */
+  .dropdown-menu a:focus-visible {
+    outline-color: var(--color-white);
+  }
+
+  .nav-mobile-extras {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    padding: 1rem 1.25rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .footer-inner {
