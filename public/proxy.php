@@ -293,9 +293,6 @@ function _hs_scope_css(string $css): string {
     $css = preg_replace('/@charset\s+[^;]+;/i', '', $css);
     $css = preg_replace('/@import\s+[^;]+;/i', '', $css);
 
-    // Strip !important from text-decoration so theme-bridge can enforce link styling
-    $css = preg_replace('/text-decoration\s*:\s*([^;!}]+)\s*!important/i', 'text-decoration: $1', $css);
-
     // Process the CSS: scope selectors inside .content-proxy
     return preg_replace_callback(
         '/@?[^{}]+\{/',
@@ -307,8 +304,11 @@ function _hs_scope_css(string $css): string {
             // Don't scope selectors inside @keyframes (from, to, percentages)
             if (preg_match('/^\s*(\d+%|from|to)\s*$/i', trim($selectors))) return $m[0];
 
-            // Split comma-separated selectors and prefix each
-            $parts = explode(',', $selectors);
+            // Split comma-separated selectors and prefix each. Only top-level commas:
+            // a comma inside :is(), :where(), :not(), :has() or [attr="a,b"] belongs
+            // to that selector. Prefixing inside :is() would raise its specificity
+            // and let it beat rules that win on HubSpot.
+            $parts = _hs_split_selectors($selectors);
             $scoped = array_map(function ($sel) {
                 $sel = trim($sel);
                 if ($sel === '') return $sel;
@@ -326,6 +326,35 @@ function _hs_scope_css(string $css): string {
         },
         $css
     );
+}
+
+/** Split a selector list on commas outside (), [] and quotes. */
+function _hs_split_selectors(string $selectors): array {
+    $parts = [];
+    $buf = '';
+    $depth = 0;
+    $quote = '';
+    $len = strlen($selectors);
+    for ($i = 0; $i < $len; $i++) {
+        $c = $selectors[$i];
+        if ($quote !== '') {
+            if ($c === '\\' && $i + 1 < $len) { $buf .= $c . $selectors[++$i]; continue; }
+            if ($c === $quote) $quote = '';
+        } elseif ($c === '"' || $c === "'") {
+            $quote = $c;
+        } elseif ($c === '(' || $c === '[') {
+            $depth++;
+        } elseif (($c === ')' || $c === ']') && $depth > 0) {
+            $depth--;
+        } elseif ($c === ',' && $depth === 0) {
+            $parts[] = $buf;
+            $buf = '';
+            continue;
+        }
+        $buf .= $c;
+    }
+    $parts[] = $buf;
+    return $parts;
 }
 
 /**
