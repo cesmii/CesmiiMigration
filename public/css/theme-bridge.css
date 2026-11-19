@@ -237,6 +237,37 @@ html, body {
   color: var(--color-white);
 }
 
+/* Top-level state marker: a 3px white underline the width of the label, on hover,
+   while the item's dropdown is open, on keyboard focus, and when the current page
+   is in that section (.active). Absolutely positioned, so it never shifts layout.
+   Desktop only; the mobile menu is unchanged. */
+.nav-text {
+  position: relative;
+}
+
+@media (min-width: 769px) {
+  .nav-text::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 3px;
+    background: var(--color-white);
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  .nav-links > li > a:hover .nav-text::after,
+  .nav-links > li > a:focus-visible .nav-text::after,
+  .nav-links > li > a.active .nav-text::after,
+  .nav-dropdown:hover > .nav-dropdown-btn .nav-text::after,
+  .nav-dropdown:focus-within > .nav-dropdown-btn .nav-text::after,
+  .nav-dropdown-btn.active .nav-text::after {
+    opacity: 1;
+  }
+}
+
 .nav-label {
   padding: 0.45rem 0.8rem;
   color: var(--color-unlinked);
@@ -268,8 +299,8 @@ html, body {
   min-width: 210px;
   background: var(--color-white);
   border: 1px solid var(--cesmii-border-light);
-  border-radius: var(--cesmii-radius-sm);
-  padding: 0.4rem;
+  border-radius: 0;
+  padding: 0.4rem 0;
   opacity: 0;
   visibility: hidden;
   transform: translateY(6px);
@@ -285,23 +316,41 @@ html, body {
 
 .dropdown-menu a {
   display: block;
-  padding: 0.55rem 0.85rem;
-  border-radius: var(--cesmii-radius-sm);
+  padding: 0.55rem 1rem;
+  border-radius: 0;
   color: var(--cesmii-ink);
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
-  transition: color var(--transition), background var(--transition);
+  transition: background var(--transition);
+}
+
+/* Hidden bold copy of the label (data-text, set in shell-renderer.js): makes the
+   panel as wide as its widest item in bold, so hovering never changes its width. */
+.dropdown-menu a::after {
+  content: attr(data-text);
+  display: block;
+  font-weight: 700;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
 }
 
 .dropdown-menu a:hover,
+.dropdown-menu a:focus-visible,
 .dropdown-menu a.active {
-  color: var(--cesmii-blue-dark);
+  color: var(--cesmii-ink);
+  font-weight: 700;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu a:focus-visible {
+  background: var(--cesmii-border);
 }
 
 .dropdown-menu .nav-label {
   display: block;
-  padding: 0.55rem 0.85rem;
+  padding: 0.55rem 1rem;
   color: var(--color-unlinked);
   font-size: 0.875rem;
   font-weight: 500;
@@ -589,12 +638,17 @@ html, body {
   outline-offset: 2px;
 }
 
-.dropdown-menu a:focus-visible,
 .content-not-found a:focus-visible,
 .content-placeholder a:focus-visible,
 .content-error a:focus-visible {
   outline: 2px solid var(--cesmii-blue-dark);
   outline-offset: 2px;
+}
+
+/* Dropdown items fill the panel edge to edge, so the ring sits inside the item. */
+.dropdown-menu a:focus-visible {
+  outline: 2px solid var(--cesmii-blue-dark);
+  outline-offset: -2px;
 }
 
 /* Keyboard users: a dropdown opens while focus is inside it, as on hover. */
@@ -684,10 +738,13 @@ html, body {
     font-size: 0.86rem;
   }
 
+  /* Mobile keeps its own look: no grey strip or bold (those are desktop only). */
   .dropdown-menu a:hover,
+  .dropdown-menu a:focus-visible,
   .dropdown-menu a.active {
     background: transparent;
     color: var(--color-white);
+    font-weight: 500;
   }
 
   /* The mobile dropdown sits on navy, so its focus ring is white too. */

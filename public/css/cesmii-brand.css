@@ -6,7 +6,7 @@
    Source of truth: CESMII Design System
    (https://claude.ai/artifact/XL97gVfxbgykVsPCUB1nS2), README and tokens.
    Decided by Jillian with Olivia, November 18, 2026: Geist everywhere,
-   body text #231f20, small blue labels #2b47da, 8px corners everywhere,
+   body text #231f20, small blue labels #2a5bb8 ("Deeper Blue", Nov 19), 8px corners everywhere,
    no em dashes, applied to both the site shell and the HubSpot theme.
 
    Status: the HubSpot theme settings were updated to match on Nov 18.
@@ -31,8 +31,8 @@
 :root {
   /* ---------- Color palette (use only these) ---------- */
   --cesmii-blue:          #4084ef; /* buttons, eyebrows, big type, borders, bands */
-  --cesmii-blue-hover:    #3670cb; /* hover fill for every button */
-  --cesmii-blue-dark:     #2b47da; /* small blue text, links in body copy, badges */
+  --cesmii-blue-hover:    #2a5bb8; /* hover fill for every button ("Deeper Blue", Nov 19) */
+  --cesmii-blue-dark:     #2a5bb8; /* small blue text, links in body copy, badges */
   --cesmii-cyan:          #00aeef; /* accent for borders and fills, never small text */
   --cesmii-purple:        #5438d4;
   --cesmii-purple-deep:   #4d006e;
@@ -96,7 +96,7 @@
 /* Links inside body copy use the darker blue for readability. */
 .cesmii-body a { color: var(--cesmii-blue-dark); }
 
-/* Buttons: CESMII blue, 8px corners, hover #3670cb. */
+/* Buttons: CESMII blue, 8px corners, hover #2a5bb8. */
 .cesmii-btn {
   display: inline-flex; align-items: center; justify-content: center;
   font: 600 15px/1.2 var(--cesmii-font);
@@ -175,7 +175,7 @@
    --color-dark       #213343         ->  var(--cesmii-navy)      #151a3d
    --color-dark-mid   #2d4457         ->  var(--cesmii-navy)      (or panel)
    --color-accent     #FF5F39 orange  ->  var(--cesmii-blue)      #4084ef
-   --color-accent-hover #E64E2A       ->  var(--cesmii-blue-hover) #3670cb
+   --color-accent-hover #E64E2A       ->  var(--cesmii-blue-hover) #2a5bb8
    --color-bg-alt     #f9fbfd         ->  var(--cesmii-panel)     #f4f5f7
    --color-text       #213343         ->  var(--cesmii-ink)       #231f20
    --color-text-muted #6e7a91         ->  var(--cesmii-ink-muted) #5e5a5b
@@ -185,5 +185,5 @@
    --font-body        DM Sans         ->  var(--cesmii-font)      Geist
    --font-heading     Plus Jakarta    ->  var(--cesmii-font)      Geist
    #1c53a3 (buttons, 5 places)        ->  var(--cesmii-blue)
-   linear-gradient(#00aeef, #2b47da)  ->  flat var(--cesmii-blue) (no gradients on web)
+   cyan-to-blue linear-gradient      ->  flat var(--cesmii-blue) (no gradients on web)
    ===================================================================== */
