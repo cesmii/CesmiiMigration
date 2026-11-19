@@ -17,10 +17,10 @@
 }
 
 :root {
-  /* Header and mobile menu background. Still a marketing decision (navy, white or
-     flat blue), so it is set only here. Switching to white also needs dark nav
-     text and a dark logo, since both are white today. */
-  --shell-header-bg:    var(--cesmii-navy);
+  /* Header and mobile menu background: CESMII blue (Jillian, Nov 19). White menu
+     text on it is about 3.6:1 contrast. Switching to white would also need dark
+     nav text and a dark logo, since both are white today. */
+  --shell-header-bg:    var(--cesmii-blue);
 
   --color-dark:         var(--cesmii-navy);
   --color-accent:       var(--cesmii-blue);
@@ -29,7 +29,7 @@
   --color-text:         var(--cesmii-ink);
   --color-text-muted:   var(--cesmii-ink-muted);
   --color-border:       var(--cesmii-border-light);
-  /* Secondary text and links on navy: the design system's floor. */
+  /* Secondary text and links on navy and blue: the design system's floor. */
   --color-on-dark-muted: rgba(255, 255, 255, 0.72);
   /* Nav entries with no URL in the gloomap. Deliberately loud so gaps are
      obvious while the site is being mapped. Change to a muted grey for launch. */
@@ -121,16 +121,17 @@ html, body {
   color: var(--color-white);
 }
 
-/* Solid button: blue fill, white 15px label, blue-hover on hover. Regular weight
+/* Solid button: white fill, Deeper Blue 15px label, Deeper Blue fill on hover. Regular weight
    and a 1px border: the top bar is small, and 600/2px read as too heavy there.
    Scoped to the header (which includes the mobile menu) so it outranks the
    "a { color: inherit }" reset above without needing to force it. */
 .site-header .top-bar-btn {
   display: inline-flex;
   align-items: center;
-  background: var(--cesmii-blue);
-  color: var(--color-white);
-  border: 1px solid var(--cesmii-blue);
+  /* White on the blue header: a blue button would vanish into the banner. */
+  background: var(--color-white);
+  color: var(--cesmii-blue-dark);
+  border: 1px solid var(--color-white);
   padding: 0.35rem 0.9rem;
   border-radius: var(--cesmii-radius-sm);
   font-weight: 400;
@@ -146,11 +147,12 @@ html, body {
   color: var(--color-white);
 }
 
-/* Outline button. On the navy header its resting border and label are white;
+/* Outline button. On the blue header its resting border and label are white;
    on hover it fills like the solid button. */
 .site-header .top-bar-btn-secondary {
   background: transparent;
   border-color: var(--color-white);
+  color: var(--color-white);
 }
 
 /* === Header === */
@@ -215,7 +217,7 @@ html, body {
   gap: 0.3rem;
   padding: 0.45rem 0.8rem;
   border-radius: var(--cesmii-radius-sm);
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--color-white);
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.84rem;
@@ -628,7 +630,7 @@ html, body {
 }
 
 /* === Keyboard focus ===
-   White ring on the navy header and footer, dark blue on white (dropdown panel,
+   White ring on the blue header and navy footer, dark blue on white (dropdown panel,
    404 page). Shell elements only: nothing inside .content-proxy. */
 
 .site-header a:focus-visible,
@@ -747,7 +749,7 @@ html, body {
     font-weight: 500;
   }
 
-  /* The mobile dropdown sits on navy, so its focus ring is white too. */
+  /* The mobile dropdown sits on the blue header colour, so its focus ring is white too. */
   .dropdown-menu a:focus-visible {
     outline-color: var(--color-white);
   }
