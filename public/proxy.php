@@ -193,6 +193,20 @@ function _hs_extract(string $html, string $source_url): string {
         $node->parentNode?->removeChild($node);
     }
 
+    // Drop empty drag-and-drop sections. HubSpot's legacy grid gives every column
+    // min-height: 1px, so a section with no modules still renders as a 1px white
+    // strip (a seam under the header on the home page, stacked strips above the
+    // footer on others). Sections with a background are kept: they may be a band.
+    foreach (iterator_to_array($xpath->query('//section[starts-with(@id,"section-")]')) as $node) {
+        $content = $xpath->query(
+            './/*[contains(@class,"hs_cos_wrapper") or contains(@class,"background")]'
+            . ' | .//img | .//picture | .//iframe | .//video | .//svg | .//form'
+            . ' | .//text()[normalize-space()]',
+            $node
+        );
+        if ($content->length === 0) $node->parentNode?->removeChild($node);
+    }
+
     // Scripts: keep inline scripts and HubSpot-hosted external scripts.
     // Strip third-party scripts unless their host is in HS_ALLOWED_SCRIPT_HOSTS.
     foreach (iterator_to_array($xpath->query('//script')) as $node) {
