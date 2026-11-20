@@ -111,6 +111,12 @@ function initDropdowns() {
 function initHubSpotLinkRewrite() {
   var HS_HOST = '43818189.hs-sites.com';
 
+  // Files (PDFs, images, downloads) live on HubSpot's file server and must keep
+  // their HubSpot URL; only pages have a local equivalent. Same rule as proxy.php.
+  function isFile(url) {
+    return /^\/(hubfs|hs-fs)\//.test(url.pathname) || /\.[a-z0-9]{2,5}$/i.test(url.pathname);
+  }
+
   function rewriteLinks(root) {
     var anchors = root.querySelectorAll
       ? root.querySelectorAll('a[href*="' + HS_HOST + '"]')
@@ -126,7 +132,7 @@ function initHubSpotLinkRewrite() {
     if (!href) return;
     try {
       var url = new URL(href, location.origin);
-      if (url.hostname === HS_HOST) {
+      if (url.hostname === HS_HOST && !isFile(url)) {
         if (!a.hasAttribute('data-hs-original')) a.setAttribute('data-hs-original', href);
         a.setAttribute('href', url.pathname + url.search + url.hash);
         debugLabelLink(a);
@@ -182,7 +188,7 @@ function initHubSpotLinkRewrite() {
     // Any other link still pointing to the HubSpot domain
     try {
       var url = new URL(href, location.origin);
-      if (url.hostname === HS_HOST) {
+      if (url.hostname === HS_HOST && !isFile(url)) {
         e.preventDefault();
         e.stopImmediatePropagation();
         location.href = url.pathname + url.search + url.hash;
