@@ -73,6 +73,10 @@ function generatePages(items, allNavItems) {
 
 // The HubSpot site whose page paths get remapped onto the nav hierarchy.
 const HS_SITE_ORIGIN = 'https://43818189.hs-sites.com';
+// Other HubSpot hosts whose menu pages also get a path-map entry. Their root-relative
+// links (e.g. "View all" -> /certified-smart-manufacturing-roadmap-professionals on
+// the SM Roadmapping page) then 301 to the page's place in our nav (dynamic.php).
+const HS_EXTRA_ORIGINS = ['https://connect.cesmii.org'];
 
 // Build { hubspotPath: localPath } from every gloomap entry that links a page on
 // the HubSpot site, e.g. '/meet-the-team' => '/about/team'. proxy.php uses it to
@@ -85,7 +89,7 @@ const HS_SITE_ORIGIN = 'https://43818189.hs-sites.com';
 function buildPathMap(navItems, homepageUrl) {
   const map = {};
   const add = (url, localPath) => {
-    if (!url || !url.startsWith(HS_SITE_ORIGIN + '/')) return;
+    if (!url || ![HS_SITE_ORIGIN, ...HS_EXTRA_ORIGINS].some((o) => url.startsWith(o + '/'))) return;
     const hsPath = new URL(url).pathname.replace(/\/+$/, '') || '/';
     if (hsPath === localPath || hsPath === '/') return;
     if (DYNAMIC_SECTIONS.some(({ prefix }) => hsPath === prefix || hsPath.startsWith(prefix + '/'))) return;
