@@ -16,7 +16,19 @@ if (__FILE__ === realpath($_SERVER['SCRIPT_FILENAME'] ?? '')) {
 }
 
 const HS_ALLOWED_HOSTS        = ['43818189.hs-sites.com', 'membershiphub.cesmii.org', 'connect.cesmii.org'];
-const HS_ALLOWED_SCRIPT_HOSTS = ['unpkg.com'];  // non-HubSpot script hosts to allow through
+const HS_ALLOWED_SCRIPT_HOSTS = [               // non-HubSpot script hosts to allow through
+    'unpkg.com',
+    'www.buzzsprout.com',                        // Buzzsprout player embeds (script that adds the player iframe)
+    'buzzsprout.com',
+];
+// Video and podcast players: iframes from these hosts (and their subdomains) are
+// kept in proxied content. Every other iframe is stripped. Iframes with no src are
+// kept too: pop-up players fill in the src from script when they open.
+const HS_ALLOWED_IFRAME_HOSTS = [
+    'youtube.com',
+    'youtube-nocookie.com',
+    'buzzsprout.com',
+];
 const HS_NO_REWRITE           = [
     'https://membershiphub.cesmii.org/welcome',
 ];
@@ -148,7 +160,8 @@ function _hs_curl(string $url, ?int &$status = null): ?string {
 /**
  * Strip HubSpot chrome and return the page content as an HTML fragment.
  * Keeps styles scoped to .content-proxy so they don't bleed into the shell.
- * Strips scripts, HubSpot header/footer/nav, iframes, and non-stylesheet links.
+ * Strips scripts, HubSpot header/footer/nav, iframes (except video players, see
+ * HS_ALLOWED_IFRAME_HOSTS), and non-stylesheet links.
  * Prefers <main>; falls back to <body>.
  */
 function _hs_extract(string $html, string $source_url): string {
@@ -180,8 +193,25 @@ function _hs_extract(string $html, string $source_url): string {
     }
 
     // Strip chrome and non-content elements (scripts handled separately below).
-    foreach (['style', 'link', 'noscript', 'header', 'footer', 'nav', 'iframe'] as $tag) {
+    foreach (['style', 'link', 'noscript', 'header', 'footer', 'nav'] as $tag) {
         foreach (iterator_to_array($xpath->query("//{$tag}")) as $node) {
+            $node->parentNode?->removeChild($node);
+        }
+    }
+
+    // Iframes: keep video/podcast players (HS_ALLOWED_IFRAME_HOSTS), strip the rest.
+    foreach (iterator_to_array($xpath->query('//iframe')) as $node) {
+        $src = trim($node->getAttribute('src'));
+        if ($node->hasAttribute('srcdoc')) {
+            $node->parentNode?->removeChild($node);
+            continue;
+        }
+        if ($src === '' || $src === 'about:blank') continue;   // filled in by a pop-up player
+        if (str_starts_with($src, '//')) {
+            $src = 'https:' . $src;                              // protocol-relative embed code
+            $node->setAttribute('src', $src);
+        }
+        if (!_hs_is_allowed_iframe($src)) {
             $node->parentNode?->removeChild($node);
         }
     }
@@ -235,7 +265,9 @@ function _hs_extract(string $html, string $source_url): string {
     $body_scripts = '';
     $body = $xpath->query('//body')->item(0);
     if ($body) {
-        foreach (iterator_to_array($xpath->query('//body//script')) as $node) {
+        // Only scripts outside <main>: those inside it are already in the fragment,
+        // and copying them again would run them twice (e.g. a player opening twice).
+        foreach (iterator_to_array($xpath->query('//body//script[not(ancestor::main)]')) as $node) {
             $body_scripts .= $dom->saveHTML($node);
         }
     }
@@ -452,7 +484,7 @@ function _hs_rewrite_urls(string $html, string $source_url): string {
 
     // Second: rewrite root-relative src to absolute HubSpot URLs (images, scripts, etc.)
     $html = preg_replace_callback(
-        '/src="(\/[^"]*)"/i',
+        '/src="(\/(?!\/)[^"]*)"/i',
         fn($m) => 'src="' . $origin . $m[1] . '"',
         $html
     );
@@ -517,13 +549,22 @@ function hs_local_path(string $path): ?string {
  * Root-relative paths (/hs/...) are HubSpot's own static assets.
  */
 function _hs_is_hubspot_script(string $src): bool {
-    if (str_starts_with($src, '/')) return true;
+    if (str_starts_with($src, '/') && !str_starts_with($src, '//')) return true;  // root-relative
     $host = parse_url($src, PHP_URL_HOST) ?: '';
     return in_array($host, HS_ALLOWED_HOSTS, true)   // HubSpot sites we proxy, incl. custom domains
         || str_ends_with($host, '.hubspot.com')
         || str_ends_with($host, '.hs-sites.com')
         || str_ends_with($host, 'hubspotusercontent-na1.net')
         || str_ends_with($host, 'hubspotusercontent-eu1.net');
+}
+
+function _hs_is_allowed_iframe(string $src): bool {
+    if (parse_url($src, PHP_URL_SCHEME) !== 'https') return false;
+    $host = strtolower(parse_url($src, PHP_URL_HOST) ?: '');
+    foreach (HS_ALLOWED_IFRAME_HOSTS as $allowed) {
+        if ($host === $allowed || str_ends_with($host, '.' . $allowed)) return true;
+    }
+    return false;
 }
 
 function _hs_error(string $msg): string {

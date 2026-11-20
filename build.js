@@ -29,6 +29,7 @@ const {
 const DYNAMIC_SECTIONS = [
   { prefix: '/bio', hsBase: 'https://43818189.hs-sites.com/bio' },
   { prefix: '/news', hsBase: 'https://43818189.hs-sites.com/news' },
+  { prefix: '/videos', hsBase: 'https://43818189.hs-sites.com/videos' },
   { prefix: '/projects', hsBase: 'https://43818189.hs-sites.com/projects' },
   { prefix: '/project', hsBase: 'https://43818189.hs-sites.com/project' },
   { prefix: '/events', hsBase: 'https://43818189.hs-sites.com/events' },
