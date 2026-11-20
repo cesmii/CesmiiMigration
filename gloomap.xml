@@ -291,15 +291,6 @@ Credentials</text>
               <member/>
             </box>
             <box>
-              <text>SM Mindset
-#https://43818189.hs-sites.com/news/tag/smart-manufacturing-mindset</text>
-              <propa>#cc9ef2</propa>
-              <propb>#000000</propb>
-              <propc>Lato</propc>
-              <propd>100%</propd>
-              <member/>
-            </box>
-            <box>
               <text>Project Library
 #http://43818189.hs-sites.com/rfp-projects</text>
               <propa>#cc9ef2</propa>
@@ -319,11 +310,35 @@ Credentials</text>
           </member>
         </box>
         <box>
-          <text>News
-#https://43818189.hs-sites.com/news</text>
+          <text>News &amp; Media</text>
           <propa>#7dbfe3</propa>
           <propb>#000000</propb>
-          <member/>
+          <member>
+            <box>
+              <text>News</text>
+              <propa>#7dbfe3</propa>
+              <propb>#000000</propb>
+              <member/>
+            </box>
+            <box>
+              <text>Videos</text>
+              <propa>#7dbfe3</propa>
+              <propb>#000000</propb>
+              <member/>
+            </box>
+            <box>
+              <text>Smart Manufacturing Mindset™</text>
+              <propa>#7dbfe3</propa>
+              <propb>#000000</propb>
+              <member/>
+            </box>
+            <box>
+              <text>Newsletter</text>
+              <propa>#7dbfe3</propa>
+              <propb>#000000</propb>
+              <member/>
+            </box>
+          </member>
         </box>
         <box>
           <text>Events
