@@ -344,8 +344,13 @@ function _hs_scope_css(string $css): string {
             $scoped = array_map(function ($sel) {
                 $sel = trim($sel);
                 if ($sel === '') return $sel;
+                // :root → .content-proxy. HubSpot themes and pages define their
+                // CSS variables (fonts, colors) on :root; scoped as ".content-proxy
+                // :root" they would match nothing and those settings would be lost.
+                if (preg_match('/^:root(?=$|[\s.\[:>+~])/i', $sel)) {
+                    $sel = preg_replace('/^:root/i', '.content-proxy', $sel);
                 // body/html selectors → .content-proxy
-                if (preg_match('/^(body|html)(\s|$|\.|\[|:)/i', $sel)) {
+                } elseif (preg_match('/^(body|html)(\s|$|\.|\[|:)/i', $sel)) {
                     $sel = preg_replace('/^(body|html)/i', '.content-proxy', $sel);
                 } elseif (preg_match('/^(body|html)$/i', $sel)) {
                     $sel = '.content-proxy';
