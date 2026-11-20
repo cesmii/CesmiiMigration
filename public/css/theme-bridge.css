@@ -555,102 +555,146 @@ html, body {
   text-underline-offset: 3px;
 }
 
-/* === Footer === */
+/* === Footer ===
+   Sitemap layout (Jillian, Nov 20): logo, tagline and contact on the left, one link
+   column per menu section, then a bottom strip with the copyright and social icons.
+   Link columns come from the gloomap (buildFooterNavHtml in lib/shell-renderer.js). */
 
 .site-footer {
   background: var(--cesmii-navy);
   color: var(--color-white);
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 0.9375rem;
+  line-height: 1.5;
   flex-shrink: 0;
 }
 
 .footer-inner {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 2rem 1.5rem 1.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  padding: 4.5rem 1.5rem 3.5rem;
+  display: grid;
+  /* Fixed-width logo block so the link columns get the rest of the row. */
+  grid-template-columns: 240px 1fr;
   gap: 3rem;
 }
 
 .footer-brand {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 1.25rem;
 }
 
 .footer-logo-img {
-  height: 38px;
-  width: auto;
+  width: 180px;
+  height: auto;
   display: block;
-  object-fit: contain;
 }
 
 .footer-tagline {
-  color: var(--color-white);
-  font-size: 0.9rem;
   margin: 0;
+  max-width: 300px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-white);
+}
+
+/* <address> is italic by default; contact lines are plain text. */
+.footer-contact {
+  font-style: normal;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: var(--color-on-dark-muted);
+}
+
+/* Columns share the space evenly, however many menu sections have links. */
+.footer-nav {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+/* Section labels: small caps in CESMII blue, which reads on navy at any size
+   (4.6:1). Bold, since the shell only loads Geist 400 and 700. */
+.footer-heading {
+  margin: 0 0 1.1rem;
+  font-family: var(--font-heading);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cesmii-blue);
+}
+
+.footer-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Footer links: muted white, full white on hover. Colour change only, no
+   underline (site link rule, Nov 19). */
+.site-footer .footer-col a,
+.site-footer .footer-contact a {
+  color: var(--color-on-dark-muted);
+  transition: color var(--transition);
+}
+
+.site-footer .footer-col a:hover,
+.site-footer .footer-contact a:hover {
+  color: var(--color-white);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.footer-bottom-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-bottom p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-on-dark-muted);
 }
 
 .footer-social {
   display: flex;
   gap: 0.75rem;
-  align-items: center;
-  margin-top: 0.25rem;
 }
 
-.footer-col .footer-social a {
-  color: var(--color-on-dark-muted);
+/* 40px outlined squares with 8px corners; filled deeper blue on hover, like buttons. */
+.site-footer .footer-social a {
   display: flex;
   align-items: center;
-  padding: 4px;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: var(--cesmii-radius-sm);
-  transition: color var(--transition), background var(--transition);
+  color: var(--color-white);
+  transition: background var(--transition), border-color var(--transition);
 }
 
-.footer-col .footer-social a:hover {
+.site-footer .footer-social a:hover {
   background: var(--cesmii-blue-hover);
-  color: var(--color-white);
+  border-color: var(--cesmii-blue-hover);
 }
 
 .footer-social a svg {
-  width: 16px;
-  height: 16px;
-}
-
-.footer-col h4 {
-  font-family: var(--font-heading);
-  color: var(--color-white);
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-}
-
-.footer-col p {
-  margin: 0 0 0.25rem;
-  color: var(--color-white);
-}
-
-.footer-col a {
-  color: var(--color-white);
-  transition: color var(--transition);
-}
-
-.footer-col a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  text-align: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.75rem;
-  color: var(--color-white);
+  width: 18px;
+  height: 18px;
 }
 
 /* === Keyboard focus ===
@@ -693,6 +737,17 @@ html, body {
 /* === Responsive === */
 
 @media (max-width: 1024px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .footer-nav {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 2.5rem;
+  }
+
   .nav-links > li > a,
   .nav-dropdown-btn {
     padding: 0.45rem 0.55rem;
@@ -792,14 +847,20 @@ html, body {
     border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
+  /* Phones: two link columns; copyright and icons stack. */
   .footer-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.25rem;
+    padding: 3.5rem 1.25rem 2.5rem;
   }
 
-  .footer-social {
-    justify-content: flex-start;
+  .footer-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 1.5rem;
+  }
+
+  .footer-bottom-inner {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    padding: 1.25rem;
   }
 }
 
