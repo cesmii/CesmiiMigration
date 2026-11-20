@@ -253,15 +253,16 @@ Credentials</text>
                   <propd>100%</propd>
                   <member/>
                 </box>
-                <box>
-                  <text>SMARPS</text>
-                  <propa>#cc9ef2</propa>
-                  <propb>#000000</propb>
-                  <propc>Lato</propc>
-                  <propd>100%</propd>
-                  <member/>
-                </box>
               </member>
+            </box>
+            <box>
+              <text>Certified Roadmap Professionals
+#https://connect.cesmii.org/certified-smart-manufacturing-roadmap-professionals</text>
+              <propa>#cc9ef2</propa>
+              <propb>#000000</propb>
+              <propc>Lato</propc>
+              <propd>100%</propd>
+              <member/>
             </box>
           </member>
         </box>
