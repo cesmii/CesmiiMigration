@@ -302,7 +302,7 @@ html, body {
   background: var(--color-white);
   border: 1px solid var(--cesmii-border-light);
   border-radius: 0;
-  padding: 0.4rem 0;
+  padding: 0;
   opacity: 0;
   visibility: hidden;
   transform: translateY(6px);
@@ -316,38 +316,62 @@ html, body {
   transform: translateY(0);
 }
 
+/* Items match the Technology Resources link list (Nov 20): square corners, thin
+   #e2e4e8 lines between items, and on hover or keyboard focus a #f4f5f7 background
+   with #2a5bb8 text (no bold). Replaces the earlier bold black text on a grey strip. */
+.dropdown-menu li + li {
+  border-top: 1px solid var(--cesmii-border-light);
+}
+
 .dropdown-menu a {
   display: block;
-  padding: 0.55rem 1rem;
+  padding: 0.65rem 1rem;
   border-radius: 0;
   color: var(--cesmii-ink);
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
-  transition: background var(--transition);
-}
-
-/* Hidden bold copy of the label (data-text, set in shell-renderer.js): makes the
-   panel as wide as its widest item in bold, so hovering never changes its width. */
-.dropdown-menu a::after {
-  content: attr(data-text);
-  display: block;
-  font-weight: 700;
-  height: 0;
-  overflow: hidden;
-  visibility: hidden;
-}
-
-.dropdown-menu a:hover,
-.dropdown-menu a:focus-visible,
-.dropdown-menu a.active {
-  color: var(--cesmii-ink);
-  font-weight: 700;
+  transition: background .15s ease, color .15s ease;
 }
 
 .dropdown-menu a:hover,
 .dropdown-menu a:focus-visible {
-  background: var(--cesmii-border);
+  background: var(--cesmii-panel);
+  color: var(--cesmii-blue-dark);
+}
+
+/* Current page: blue text, no background. */
+.dropdown-menu a.active {
+  color: var(--cesmii-blue-dark);
+}
+
+/* Any arrow inside an item (an .link-arrow span or an svg) slides 4px right. */
+.dropdown-menu a .link-arrow,
+.dropdown-menu a svg {
+  display: inline-block;
+  margin-left: 0.35rem;
+  transition: transform .15s ease;
+}
+
+.dropdown-menu a:hover .link-arrow,
+.dropdown-menu a:focus-visible .link-arrow,
+.dropdown-menu a:hover svg,
+.dropdown-menu a:focus-visible svg {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropdown-menu a,
+  .dropdown-menu a .link-arrow,
+  .dropdown-menu a svg {
+    transition: none;
+  }
+  .dropdown-menu a:hover .link-arrow,
+  .dropdown-menu a:focus-visible .link-arrow,
+  .dropdown-menu a:hover svg,
+  .dropdown-menu a:focus-visible svg {
+    transform: none;
+  }
 }
 
 .dropdown-menu .nav-label {
@@ -740,7 +764,11 @@ html, body {
     font-size: 0.86rem;
   }
 
-  /* Mobile keeps its own look: no grey strip or bold (those are desktop only). */
+  /* Mobile keeps its own look: no light panel or divider lines (desktop only). */
+  .dropdown-menu li + li {
+    border-top: none;
+  }
+
   .dropdown-menu a:hover,
   .dropdown-menu a:focus-visible,
   .dropdown-menu a.active {

@@ -308,3 +308,66 @@ debug-only behaviour under the same class/function.
   manually before the next run.
 - **srcset not rewritten** — `hs_rewrite_urls()` handles `src` and `href` but not `srcset`.
   If responsive images break on a proxied page, add a srcset rewrite pass in proxy.php.
+
+---
+
+## Coding standards (from Jillian, Nov 2026)
+
+Follow these on every change. When proposing a change, say how it meets them.
+
+### Stay in scope: look and feel only
+Claude's default job in this repo is aesthetics: how the site looks, not how it runs.
+- **In scope:** styles in `public/css/`, images in `public/images/`, and the visual
+  markup and wording of the header, menu and footer in `lib/shell-renderer.js`.
+- **Out of scope unless Jillian explicitly asks:** anything that affects how the
+  site runs, including `public/proxy.php`, `build.js`, `lib/gloomap-parser.js`, the
+  dynamic page handler and routing, caching, `public/js/app.js` behaviour, nginx
+  configs, `deploy.sh`, `package.json` and server setup.
+- If a request can only be done by touching out-of-scope code, stop and say so in
+  plain language first. If Jillian approves, put that work in its own pull request,
+  separate from styling, and flag it for Olivia to review.
+
+### Good practice
+- Make the smallest change that does the job, and match the style of the code around it.
+- Explain *why* in comments where the reason isn't obvious from the code.
+- Test before handing back: `php -l` on PHP files, run `node build.js`, and check
+  affected pages locally (`npm run dev`).
+- Never edit `out/`; it is regenerated on every build.
+
+### Git and approvals
+- Never push to `main`. Work on a branch and open a pull request; Jillian approves
+  and merges everything.
+- Never erase or rewrite history: no force push, no `git reset --hard` on shared
+  branches, no rebasing published commits, no deleting branches you didn't create.
+- Write commit messages in plain English that a non-developer can follow.
+
+### No hardcoding
+- Put settings (hosts, URLs, paths, timeouts) in one named constant or config map
+  near the top of the file, with a comment saying what it's for, not scattered
+  through the code. Existing examples: `HS_ALLOWED_HOSTS`, `HS_ALLOWED_IFRAME_HOSTS`
+  and `NAV_LINK_OVERRIDES`.
+- Menu structure belongs in `gloomap.xml`; brand colors, fonts and spacing belong in
+  the CSS variables in `public/css/cesmii-brand.css`. Use `var(--cesmii-...)`, not
+  raw hex values.
+- Anything that differs between servers (domains, credentials) belongs in
+  environment variables, not in code.
+
+### Secrets and sensitive information
+- Never commit passwords, API keys, tokens, private keys or `.env` files. `.env` is
+  in `.gitignore`; keep it there.
+- Never put secrets, internal server details or personal data (emails, phone
+  numbers beyond the public contact info) in code, comments, commit messages, logs
+  or error pages shown to visitors.
+- Treat HubSpot content as untrusted: keep the proxy's allow-lists (scripts,
+  iframes) as narrow as possible and only https. Add a host only when a real page
+  needs it.
+
+### Performance
+- No new runtime dependencies or third-party scripts without a clear reason.
+- Keep `hs_fetch()` caching intact; never add an uncached upstream fetch to a page
+  request.
+- Prefer static pages (see "prefer static HTML" above).
+- Keep CSS and JS lean: no large libraries for small effects, and respect
+  `prefers-reduced-motion` for animation.
+- Keep CSS and JS as files linked through `ASSET_VERSION` (set on every build), so
+  browsers cache them but always get new versions after a deploy.
